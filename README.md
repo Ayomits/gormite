@@ -3,7 +3,9 @@
 # Usage
 
 ```shell
-go run ./pkg/gormite/runners/exec -t goose --dsn "$DATABASE_DSN"
+go install github.com/KoNekoD/gormite/cmd/gormite@latest
+
+gormite -t goose --dsn "$DATABASE_DSN"
 ```
 
 Gormite todo:

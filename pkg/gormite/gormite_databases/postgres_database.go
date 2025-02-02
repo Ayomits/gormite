@@ -19,7 +19,10 @@ import (
 
 type PgxWrappedDatabase interface {
 	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
-	Exec(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error)
+	Exec(ctx context.Context, sql string, arguments ...any) (
+		pgconn.CommandTag,
+		error,
+	)
 }
 
 type PostgresDatabase struct {
@@ -33,8 +36,8 @@ type PostgresDatabase struct {
 // PostgresDatabaseInterface - TODO: Remove after move to utility library
 type PostgresDatabaseInterface interface {
 	Exec(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error)
-	Select(sql string, args ...interface{}) *Query
-	Get(sql string, args ...interface{}) *Query
+	Select(sql string, args ...interface{}) QueryInterface
+	Get(sql string, args ...interface{}) QueryInterface
 }
 
 // todo: сделать интерфейс-обертку чтобы можно было использовать транзакцию в качестве основы
@@ -127,12 +130,18 @@ func (w *PgXWrapper) Query(
 	return v, err
 }
 
-func (d *PostgresDatabase) Select(sql string, args ...interface{}) *Query {
+func (d *PostgresDatabase) Select(sql string, args ...interface{}) QueryInterface {
 	return &Query{db: d.PgX, sql: sql, args: args, logger: d.logger}
 }
 
-func (d *PostgresDatabase) Get(sql string, args ...interface{}) *Query {
-	return &Query{db: d.PgX, sql: sql, args: args, scanFirst: true, logger: d.logger}
+func (d *PostgresDatabase) Get(sql string, args ...interface{}) QueryInterface {
+	return &Query{
+		db:        d.PgX,
+		sql:       sql,
+		args:      args,
+		scanFirst: true,
+		logger:    d.logger,
+	}
 }
 
 func (d *PostgresDatabase) Exec(
@@ -159,14 +168,19 @@ type Query struct {
 	scanFirst bool
 	scanCol   bool
 }
+type QueryInterface interface {
+	Scan(dest ...interface{}) QueryInterface
+	ScanCol(dest ...interface{}) QueryInterface
+	Exec(ctx context.Context) error
+}
 
-func (q *Query) Scan(dest ...interface{}) *Query {
+func (q *Query) Scan(dest ...interface{}) QueryInterface {
 	q.scan = append(q.scan, dest...)
 
 	return q
 }
 
-func (q *Query) ScanCol(dest ...interface{}) *Query {
+func (q *Query) ScanCol(dest ...interface{}) QueryInterface {
 	q.scan = append(q.scan, dest...)
 	q.scanCol = true
 

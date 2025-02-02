@@ -31,7 +31,7 @@ Gormite todo:
 	  package main
 	  
 	  type _ struct {
-		  ID int `db:"id" id:"true"`
+		  ID int `db:"id" pk:"true"`
 	  }
   ```
 

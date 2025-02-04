@@ -1,0 +1,34 @@
+## Tags
+
+* **db**
+
+\- column name in db
+* **pk**
+
+\- if set then column is primary key
+* **nullable**
+\- if set then column is nullable(without NOT NULL)
+* **length**
+
+\- column length(useful for varchar)
+* **uniq**
+
+\- if set then column is unique(can be placed to many properties - grouped, on single column can be many uniq's, separated by
+`,`
+)
+* **uniq_cond**
+
+\- work in pair with uniq, uniq_cond is a condition for uniq, can be placed on any column(of grouped uniq's, do not set to every column of grouped uniq's, can be multiple, separated by
+`,`
+)
+* **index**
+\- if set then column is index(logic same as uniq)
+* **index_cond**
+
+\- work in pair with index(logic same as uniq_cond)
+* **default**
+
+\- if set then column has default value
+* **type**
+
+\- if set then column has type(manually set, without struct property type checking), Possible types: text, varchar, json, jsonb, integer

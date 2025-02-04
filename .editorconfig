@@ -64,3 +64,7 @@ ij_yaml_spaces_within_brackets = true
 [*_test.go]
 ij_visual_guides = 119
 max_line_length = 120
+
+[*.json]
+indent_style = space
+indent_size = 1

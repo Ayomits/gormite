@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/KoNekoD/gormite/pkg/gormite/runners"
+	"github.com/KoNekoD/gormite/pkg/runners"
 	"github.com/gookit/goutil/cflag"
 	"github.com/pkg/errors"
 	"slices"

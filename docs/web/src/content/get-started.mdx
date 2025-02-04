@@ -1,0 +1,95 @@
+import { Steps } from 'nextra/components'
+
+# Get Started
+
+You can just start using Gormite with the following commands:
+
+## Quick start with Goose
+
+You can start by configuring your own Gormite binary.
+
+## Create manually
+
+Gormite works as an external utility, so it doesn't need to plug into `go.mod`,
+and it accepts configs to read mappings from it. To start: [^3]
+
+<Steps>
+### Install Gormite [^1]
+
+```sh copy
+go install github.com/KoNekoD/gormite/cmd/gormite@latest
+```
+
+### Create a `gormite.yaml` config file under the resources directory [^2]
+
+```yaml copy filename="resources/gormite.yaml"
+gormite:
+  orm:
+    mapping:
+      Entities:
+        dir: pkg/entities
+```
+
+### Create a `theme.config.js` file for the docs theme
+
+```go copy filename="pkg/entities/user.go"
+package entities
+
+import "github.com/KoNekoD/gormite/test/docs_example/pkg/enums"
+
+// Entities can have custom table names
+//      \/
+
+// User "app_user"
+type User struct {
+	ID           int                `db:"id" pk:"true"`
+	Email        string             `db:"email" uniq:"email" length:"180" uniq_cond:"email:(identity_type = 'email')"`
+	Phone        string             `db:"phone" uniq:"phone" length:"10" uniq_cond:"phone:(identity_type = 'phone')"`
+	IdentityType enums.IdentityType `db:"identity_type" type:"varchar"`
+	Code         *string            `db:"code" nullable:"true"`
+	FullName     *string            `db:"full_name" default:"'Anonymous'" index:"index_full_name" index_cond:"index_full_name:(is_active = true)"`
+	IsActive     bool               `db:"is_active"`
+}
+
+type UserProfile struct {
+	ID   int   `db:"id" pk:"true"`
+	User *User `db:"user_id"`
+	Age  int   `db:"age"`
+}
+```
+
+> [!NOTE]
+>
+> More info about tags configuration options for the docs can be found
+> [here](/docs/advanced/tags).
+
+### You are good to go! Run this command to generate migrations diff
+
+```sh copy
+gormite -t goose --dsn "$DATABASE_DSN"
+```
+
+</Steps>
+
+---
+
+<span id="sidebar-and-anchor-links" />
+
+> [!NOTE]
+>
+> Any `tag` or `tags` will be read by Gormite
+> and [here](/docs/advanced/tags-usage) you can read it.
+> <br /> Check the source code: https://github.com/KoNekoD/gormite for
+> more information.
+
+> [!TIP]
+>
+> You can also use
+> [`reading sources :)`](https://github.com/KoNekoD/gormite)
+> to know internal logic of `Gormite`.
+
+[^1]: Install Gormite.
+
+[^2]: Create a `gormite.yaml` config file under the resources directory.
+
+[^3]: To start.

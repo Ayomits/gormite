@@ -1,0 +1,11 @@
+name: gormite
+
+services:
+  docs-web:
+    container_name: docs-web
+    build:
+      dockerfile: docs/web/Dockerfile
+    volumes:
+      - ./docs/web:/app:cached
+    ports:
+      - "8080:8080"

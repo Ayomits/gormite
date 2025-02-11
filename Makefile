@@ -12,7 +12,7 @@ git_tag_increment_minor_version:
 			PATCH=$$(echo $$LAST_TAG | cut -d. -f3); \
 			NEW_PATCH=$$((PATCH + 1)); NEW_TAG="$${MAJOR}.$${MINOR}.$${NEW_PATCH}"; \
 			echo "New tag: $$NEW_TAG"; \
-			git push origin "$$NEW_TAG"; \
 			git tag "$$NEW_TAG"; \
+			git push origin "$$NEW_TAG"; \
 			echo "Tag '$$NEW_TAG' successfully created and pushed."; \
 	fi

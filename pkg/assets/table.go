@@ -149,7 +149,7 @@ func (t *Table) AddIndex(
 	flags []string,
 	options map[string]interface{},
 ) *Table {
-	if indexName == nil {
+	if indexName == nil || len(*indexName) > t.getMaxIdentifierLength() {
 		columns := make([]string, 0)
 		columns = append(columns, t.GetName())
 		columns = append(columns, columnNames...)

@@ -1,0 +1,5 @@
+gormite:
+  orm:
+    mapping:
+      Entities:
+        dir: pkg/entities

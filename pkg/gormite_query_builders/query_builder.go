@@ -420,14 +420,9 @@ func (qb *QueryBuilder[ResultType]) Distinct(distinct bool) *QueryBuilder[Result
 //	    .leftJoin('u', 'phonenumbers', 'u.id = p.user_id');
 //
 // </code>
-// @param string expression     The selection expression.
-// @param string ...expressions Additional selection expressions.
-func (qb *QueryBuilder[ResultType]) AddSelect(
-	expression string,
-	expressions ...string,
-) *QueryBuilder[ResultType] {
+// @param string expression     The selection expressions.
+func (qb *QueryBuilder[ResultType]) AddSelect(expressions ...string) *QueryBuilder[ResultType] {
 	qb.queryType = enums.QueryTypeSelect
-	qb.selectParts = append(qb.selectParts, expression)
 	qb.selectParts = append(qb.selectParts, expressions...)
 	qb.sql = nil
 	return qb
@@ -648,13 +643,8 @@ func (qb *QueryBuilder[ResultType]) Set(key, value string) *QueryBuilder[ResultT
 //	    .where(or);
 //
 // </code>
-// @param string|CompositeExpression predicate     The WHERE clause predicate.
-// @param string|CompositeExpression ...predicates Additional WHERE clause predicates.
-func (qb *QueryBuilder[ResultType]) Where(
-	predicate string,
-	predicates ...string,
-) *QueryBuilder[ResultType] {
-	predicateItem := &dtos.CompositeExpressionOrString{String: &predicate}
+// @param string|CompositeExpression predicate     The WHERE clause predicates.
+func (qb *QueryBuilder[ResultType]) Where(predicates ...string) *QueryBuilder[ResultType] {
 	predicatesItem := make([]*dtos.CompositeExpressionOrString, 0)
 	for _, s := range predicates {
 		predicatesItem = append(
@@ -663,16 +653,13 @@ func (qb *QueryBuilder[ResultType]) Where(
 		)
 	}
 
-	qb.where = qb.createPredicate(predicateItem, predicatesItem...)
+	qb.where = qb.createPredicate(predicatesItem...)
 	qb.sql = nil
 	return qb
 }
 
-func (qb *QueryBuilder[ResultType]) WhereViaExpr(
-	predicate *dtos.CompositeExpressionOrString,
-	predicates ...*dtos.CompositeExpressionOrString,
-) *QueryBuilder[ResultType] {
-	qb.where = qb.createPredicate(predicate, predicates...)
+func (qb *QueryBuilder[ResultType]) WhereViaExpr(predicates ...*dtos.CompositeExpressionOrString) *QueryBuilder[ResultType] {
+	qb.where = qb.createPredicate(predicates...)
 	qb.sql = nil
 	return qb
 }
@@ -689,13 +676,8 @@ func (qb *QueryBuilder[ResultType]) WhereViaExpr(
 //
 // </code>
 // @see where()
-// @param string|CompositeExpression predicate     The predicate to append.
-// @param string|CompositeExpression ...predicates Additional predicates to append.
-func (qb *QueryBuilder[ResultType]) AndWhere(
-	predicate string,
-	predicates ...string,
-) *QueryBuilder[ResultType] {
-	predicateItem := &dtos.CompositeExpressionOrString{String: &predicate}
+// @param string|CompositeExpression predicate     The predicates to append.
+func (qb *QueryBuilder[ResultType]) AndWhere(predicates ...string) *QueryBuilder[ResultType] {
 	predicatesItem := make([]*dtos.CompositeExpressionOrString, 0)
 	for _, s := range predicates {
 		predicatesItem = append(
@@ -707,26 +689,17 @@ func (qb *QueryBuilder[ResultType]) AndWhere(
 	qb.where = qb.appendToPredicate(
 		qb.where,
 		dtos.CompositeExpressionTypeAnd,
-		append(
-			[]*dtos.CompositeExpressionOrString{predicateItem},
-			predicatesItem...,
-		)...,
+		predicatesItem...,
 	)
 	qb.sql = nil
 	return qb
 }
 
-func (qb *QueryBuilder[ResultType]) AndWhereViaExpr(
-	predicate *dtos.CompositeExpressionOrString,
-	predicates ...*dtos.CompositeExpressionOrString,
-) *QueryBuilder[ResultType] {
+func (qb *QueryBuilder[ResultType]) AndWhereViaExpr(predicates ...*dtos.CompositeExpressionOrString) *QueryBuilder[ResultType] {
 	qb.where = qb.appendToPredicate(
 		qb.where,
 		dtos.CompositeExpressionTypeAnd,
-		append(
-			[]*dtos.CompositeExpressionOrString{predicate},
-			predicates...,
-		)...,
+		predicates...,
 	)
 	qb.sql = nil
 	return qb
@@ -744,19 +717,12 @@ func (qb *QueryBuilder[ResultType]) AndWhereViaExpr(
 //
 // </code>
 // @see where()
-// @param string|CompositeExpression predicate     The predicate to append.
-// @param string|CompositeExpression ...predicates Additional predicates to append.
-func (qb *QueryBuilder[ResultType]) OrWhere(
-	predicate *dtos.CompositeExpressionOrString,
-	predicates ...*dtos.CompositeExpressionOrString,
-) *QueryBuilder[ResultType] {
+// @param string|CompositeExpression predicate     The predicates to append.
+func (qb *QueryBuilder[ResultType]) OrWhere(predicates ...*dtos.CompositeExpressionOrString) *QueryBuilder[ResultType] {
 	qb.where = qb.appendToPredicate(
 		qb.where,
 		dtos.CompositeExpressionTypeOr,
-		append(
-			[]*dtos.CompositeExpressionOrString{predicate},
-			predicates...,
-		)...,
+		predicates...,
 	)
 	qb.sql = nil
 	return qb
@@ -772,13 +738,9 @@ func (qb *QueryBuilder[ResultType]) OrWhere(
 //	    .groupBy('u.id');
 //
 // </code>
-// @param string expression     The grouping expression
-// @param string ...expressions Additional grouping expressions
-func (qb *QueryBuilder[ResultType]) GroupBy(
-	expression string,
-	expressions ...string,
-) *QueryBuilder[ResultType] {
-	qb.groupBy = append([]string{expression}, expressions...)
+// @param string expression     The grouping expressions
+func (qb *QueryBuilder[ResultType]) GroupBy(expressions ...string) *QueryBuilder[ResultType] {
+	qb.groupBy = append([]string{}, expressions...)
 	qb.sql = nil
 	return qb
 }
@@ -793,16 +755,9 @@ func (qb *QueryBuilder[ResultType]) GroupBy(
 //	    .addGroupBy('u.createdAt');
 //
 // </code>
-// @param string expression     The grouping expression
-// @param string ...expressions Additional grouping expressions
-func (qb *QueryBuilder[ResultType]) AddGroupBy(
-	expression string,
-	expressions ...string,
-) *QueryBuilder[ResultType] {
-	qb.groupBy = append(
-		qb.groupBy,
-		append([]string{expression}, expressions...)...,
-	)
+// @param string expression     The grouping expressions
+func (qb *QueryBuilder[ResultType]) AddGroupBy(expressions ...string) *QueryBuilder[ResultType] {
+	qb.groupBy = append(qb.groupBy, expressions...)
 	qb.sql = nil
 	return qb
 }
@@ -850,32 +805,21 @@ func (qb *QueryBuilder[ResultType]) Values(values map[string]string) *QueryBuild
 
 // Having - Specifies a restriction over the groups of the query.
 // Replaces any previous having restrictions, if any.
-// @param string|CompositeExpression predicate     The HAVING clause predicate.
-// @param string|CompositeExpression ...predicates Additional HAVING clause predicates.
-func (qb *QueryBuilder[ResultType]) Having(
-	predicate *dtos.CompositeExpressionOrString,
-	predicates ...*dtos.CompositeExpressionOrString,
-) *QueryBuilder[ResultType] {
-	qb.having = qb.createPredicate(predicate, predicates...)
+// @param string|CompositeExpression predicate     The HAVING clause predicates.
+func (qb *QueryBuilder[ResultType]) Having(predicates ...*dtos.CompositeExpressionOrString) *QueryBuilder[ResultType] {
+	qb.having = qb.createPredicate(predicates...)
 	qb.sql = nil
 	return qb
 }
 
 // AndHaving - Adds a restriction over the groups of the query, forming a logical
 // conjunction with any existing having restrictions.
-// @param string|CompositeExpression predicate     The predicate to append.
-// @param string|CompositeExpression ...predicates Additional predicates to append.
-func (qb *QueryBuilder[ResultType]) AndHaving(
-	predicate *dtos.CompositeExpressionOrString,
-	predicates ...*dtos.CompositeExpressionOrString,
-) *QueryBuilder[ResultType] {
+// @param string|CompositeExpression predicate     The predicates to append.
+func (qb *QueryBuilder[ResultType]) AndHaving(predicates ...*dtos.CompositeExpressionOrString) *QueryBuilder[ResultType] {
 	qb.having = qb.appendToPredicate(
 		qb.having,
 		dtos.CompositeExpressionTypeAnd,
-		append(
-			[]*dtos.CompositeExpressionOrString{predicate},
-			predicates...,
-		)...,
+		predicates...,
 	)
 	qb.sql = nil
 	return qb
@@ -883,38 +827,24 @@ func (qb *QueryBuilder[ResultType]) AndHaving(
 
 // OrHaving - Adds a restriction over the groups of the query, forming a logical
 // disjunction with any existing having restrictions.
-// @param string|CompositeExpression predicate     The predicate to append.
-// @param string|CompositeExpression ...predicates Additional predicates to append.
-func (qb *QueryBuilder[ResultType]) OrHaving(
-	predicate *dtos.CompositeExpressionOrString,
-	predicates ...*dtos.CompositeExpressionOrString,
-) *QueryBuilder[ResultType] {
+// @param string|CompositeExpression predicate     The predicates to append.
+func (qb *QueryBuilder[ResultType]) OrHaving(predicates ...*dtos.CompositeExpressionOrString) *QueryBuilder[ResultType] {
 	qb.having = qb.appendToPredicate(
 		qb.having,
 		dtos.CompositeExpressionTypeOr,
-		append(
-			[]*dtos.CompositeExpressionOrString{predicate},
-			predicates...,
-		)...,
+		predicates...,
 	)
 	qb.sql = nil
 	return qb
 }
 
 // createPredicate - Creates a CompositeExpression from one or more predicates combined by the AND logic.
-func (qb *QueryBuilder[ResultType]) createPredicate(
-	predicate *dtos.CompositeExpressionOrString,
-	predicates ...*dtos.CompositeExpressionOrString,
-) *dtos.CompositeExpressionOrString {
-	if len(predicates) == 0 {
-		return predicate
+func (qb *QueryBuilder[ResultType]) createPredicate(predicates ...*dtos.CompositeExpressionOrString) *dtos.CompositeExpressionOrString {
+	if len(predicates) == 1 {
+		return predicates[0]
 	}
-	return &dtos.CompositeExpressionOrString{
-		CompositeExpression: dtos.NewAndCompositeExpression(
-			predicate,
-			predicates...,
-		),
-	}
+
+	return &dtos.CompositeExpressionOrString{CompositeExpression: dtos.NewAndCompositeExpression(predicates...)}
 }
 
 // appendToPredicate - Appends the given predicates combined by the given type of logic to the current predicate.
@@ -924,12 +854,7 @@ func (qb *QueryBuilder[ResultType]) appendToPredicate(
 	predicates ...*dtos.CompositeExpressionOrString,
 ) *dtos.CompositeExpressionOrString {
 	if currentPredicate != nil && currentPredicate.CompositeExpression != nil && currentPredicate.CompositeExpression.GetType() == string(exprType) {
-		return &dtos.CompositeExpressionOrString{
-			CompositeExpression: currentPredicate.CompositeExpression.With(
-				predicates[0],
-				predicates[1:]...,
-			),
-		}
+		return &dtos.CompositeExpressionOrString{CompositeExpression: currentPredicate.CompositeExpression.With(predicates...)}
 	}
 
 	if currentPredicate != nil {
@@ -944,8 +869,7 @@ func (qb *QueryBuilder[ResultType]) appendToPredicate(
 	return &dtos.CompositeExpressionOrString{
 		CompositeExpression: dtos.NewCompositeExpression(
 			exprType,
-			predicates[0],
-			predicates[1:]...,
+			predicates...,
 		),
 	}
 }

@@ -51,39 +51,22 @@ type CompositeExpression struct {
 // NewCompositeExpression - Use the NewAndCompositeExpression() / NewOrCompositeExpression() factory methods.
 func NewCompositeExpression(
 	expressionType CompositeExpressionType,
-	part *CompositeExpressionOrString,
 	parts ...*CompositeExpressionOrString,
 ) *CompositeExpression {
-	parts = append([]*CompositeExpressionOrString{part}, parts...)
-
-	return &CompositeExpression{
-		exprType: string(expressionType),
-		parts:    parts,
-	}
+	return &CompositeExpression{exprType: string(expressionType), parts: parts}
 }
 
-func NewAndCompositeExpression(
-	part *CompositeExpressionOrString,
-	parts ...*CompositeExpressionOrString,
-) *CompositeExpression {
-	return NewCompositeExpression(CompositeExpressionTypeAnd, part, parts...)
+func NewAndCompositeExpression(parts ...*CompositeExpressionOrString) *CompositeExpression {
+	return NewCompositeExpression(CompositeExpressionTypeAnd, parts...)
 }
 
-func NewOrCompositeExpression(
-	part *CompositeExpressionOrString,
-	parts ...*CompositeExpressionOrString,
-) *CompositeExpression {
-	return NewCompositeExpression(CompositeExpressionTypeOr, part, parts...)
+func NewOrCompositeExpression(parts ...*CompositeExpressionOrString) *CompositeExpression {
+	return NewCompositeExpression(CompositeExpressionTypeOr, parts...)
 }
 
 // With - Returns a new CompositeExpression with the given parts added.
-func (c *CompositeExpression) With(
-	part *CompositeExpressionOrString,
-	parts ...*CompositeExpressionOrString,
-) *CompositeExpression {
+func (c *CompositeExpression) With(parts ...*CompositeExpressionOrString) *CompositeExpression {
 	that := c.Clone()
-
-	parts = append([]*CompositeExpressionOrString{part}, parts...)
 
 	that.parts = append(that.parts, parts...)
 

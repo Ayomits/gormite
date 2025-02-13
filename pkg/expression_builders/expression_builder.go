@@ -18,60 +18,32 @@ const (
 )
 
 // And - Creates a conjunction of the given expressions.
-func (b *ExpressionBuilder) And(
-	expression string,
-	expressions ...string,
-) *dtos.CompositeExpression {
-	expressionComposite := &dtos.CompositeExpressionOrString{String: &expression}
-
-	expressionsComposite := make(
-		[]*dtos.CompositeExpressionOrString,
-		len(expressions),
-	)
-	for i, e := range expressions {
+func (b *ExpressionBuilder) And(expr ...string) *dtos.CompositeExpression {
+	expressionsComposite := make([]*dtos.CompositeExpressionOrString, len(expr))
+	for i, e := range expr {
 		expressionsComposite[i] = &dtos.CompositeExpressionOrString{String: &e}
 	}
 
-	return dtos.NewAndCompositeExpression(
-		expressionComposite,
-		expressionsComposite...,
-	)
+	return dtos.NewAndCompositeExpression(expressionsComposite...)
 }
 
 // AndComposite - Creates a conjunction of the given expressions.
-func (b *ExpressionBuilder) AndComposite(
-	expression *dtos.CompositeExpressionOrString,
-	expressions ...*dtos.CompositeExpressionOrString,
-) *dtos.CompositeExpression {
-	return dtos.NewAndCompositeExpression(expression, expressions...)
+func (b *ExpressionBuilder) AndComposite(expr ...*dtos.CompositeExpressionOrString) *dtos.CompositeExpression {
+	return dtos.NewAndCompositeExpression(expr...)
 }
 
 // Or - Creates a disjunction of the given expressions.
-func (b *ExpressionBuilder) Or(
-	expression string,
-	expressions ...string,
-) *dtos.CompositeExpression {
-	expressionComposite := &dtos.CompositeExpressionOrString{String: &expression}
-
-	expressionsComposite := make(
-		[]*dtos.CompositeExpressionOrString,
-		len(expressions),
-	)
-	for i, e := range expressions {
+func (b *ExpressionBuilder) Or(expr ...string) *dtos.CompositeExpression {
+	expressionsComposite := make([]*dtos.CompositeExpressionOrString, len(expr))
+	for i, e := range expr {
 		expressionsComposite[i] = &dtos.CompositeExpressionOrString{String: &e}
 	}
 
-	return dtos.NewOrCompositeExpression(
-		expressionComposite,
-		expressionsComposite...,
-	)
+	return dtos.NewOrCompositeExpression(expressionsComposite...)
 }
 
-func (b *ExpressionBuilder) OrComposite(
-	expression *dtos.CompositeExpressionOrString,
-	expressions ...*dtos.CompositeExpressionOrString,
-) *dtos.CompositeExpression {
-	return dtos.NewOrCompositeExpression(expression, expressions...)
+func (b *ExpressionBuilder) OrComposite(expr ...*dtos.CompositeExpressionOrString) *dtos.CompositeExpression {
+	return dtos.NewOrCompositeExpression(expr...)
 }
 
 // Comparison - Creates a comparison expression.

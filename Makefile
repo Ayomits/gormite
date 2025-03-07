@@ -5,7 +5,7 @@ git_tag_increment_minor_version:
 			echo "Tag '$$TAG_ON_HEAD_COMMIT' already exists on that commit. Skipping tagging."; \
 	else \
 			echo "Getting last tag..."; \
-			LAST_TAG=$$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0"); \
+			LAST_TAG=$$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0"); \
 			echo "Last tag: $$LAST_TAG"; \
 			MAJOR=$$(echo $$LAST_TAG | cut -d. -f1); \
 			MINOR=$$(echo $$LAST_TAG | cut -d. -f2); \

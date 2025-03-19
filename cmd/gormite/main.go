@@ -32,6 +32,13 @@ func main() {
 		"database connection string;true;dsn,db,d",
 	)
 
+	c.StringVar(
+		&opts.ConfigPath,
+		"config-path",
+		"resources/gormite.yaml",
+		"config path;true;config,c",
+	)
+
 	c.AddValidator("tool", toolValidate)
 
 	c.Func = func(c *cflag.CFlags) error { return runners.NewDiffRunner(opts).Run() }

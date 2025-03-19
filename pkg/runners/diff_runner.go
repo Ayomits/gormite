@@ -32,8 +32,9 @@ const (
 )
 
 type DiffRunnerOptions struct {
-	Tool string
-	Dsn  string
+	Tool       string
+	Dsn        string
+	ConfigPath string
 }
 
 type DiffRunner struct{ opts DiffRunnerOptions }
@@ -56,7 +57,7 @@ func (r *DiffRunner) Run() error {
 
 	oldSchema := manager.IntrospectSchema()
 
-	newSchema, err := local_schema.IntrospectLocalSchema("resources/gormite.yaml")
+	newSchema, err := local_schema.IntrospectLocalSchema(r.opts.ConfigPath)
 	if err != nil {
 		return errors.Wrap(err, "failed to introspect local schema")
 	}

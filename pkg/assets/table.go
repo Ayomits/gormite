@@ -827,10 +827,3 @@ func (t *Table) createIndex(
 
 	return NewIndex(indexName, columns, isUnique, isPrimary, flags, options)
 }
-
-func (t *Table) ClearImplicitIndexes() {
-	for key := range t.implicitIndexes {
-		delete(t.indexes, t.normalizeIdentifier(&key))
-		delete(t.implicitIndexes, t.normalizeIdentifier(&key))
-	}
-}

@@ -56,14 +56,6 @@ func TestDiffRunnerTest(t *testing.T) {
 		panic(errors.Wrap(err, "failed to introspect local schema"))
 	}
 
-	// Remove implicit indexes
-	for _, table := range oldSchema.GetTables() {
-		table.ClearImplicitIndexes()
-	}
-	for _, table := range newSchema.GetTables() {
-		table.ClearImplicitIndexes()
-	}
-
 	c := diff_calc.NewComparator(p)
 
 	diff := c.CompareSchemas(oldSchema, newSchema)

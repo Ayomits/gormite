@@ -10,6 +10,7 @@ require (
 	github.com/elliotchance/orderedmap/v3 v3.1.0
 	github.com/elliotchance/pie/v2 v2.9.1
 	github.com/fatih/structtag v1.2.0
+	github.com/google/go-cmp v0.5.8
 	github.com/gookit/goutil v0.6.18
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/pkg/errors v0.9.1

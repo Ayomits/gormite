@@ -2,8 +2,10 @@ package diff_calc
 
 import (
 	"github.com/KoNekoD/gormite/pkg/assets"
-	diff_dtos "github.com/KoNekoD/gormite/pkg/diff_dtos"
+	"github.com/KoNekoD/gormite/pkg/diff_dtos"
 	"github.com/KoNekoD/gormite/pkg/utils"
+	"github.com/google/go-cmp/cmp"
+	"maps"
 	"slices"
 	"strings"
 )
@@ -251,8 +253,8 @@ func (c *Comparator) CompareTables(oldTable, newTable *assets.Table) *diff_dtos.
 
 	renamedIndexes := c.detectRenamedIndexes(addedIndexes, droppedIndexes)
 
-	oldForeignKeys := oldTable.GetForeignKeys()
-	newForeignKeys := newTable.GetForeignKeys()
+	oldForeignKeys := maps.Clone(oldTable.GetForeignKeys())
+	newForeignKeys := maps.Clone(newTable.GetForeignKeys())
 
 	for oldKey, oldForeignKey := range oldForeignKeys {
 		for newKey, newForeignKey := range newForeignKeys {
@@ -411,11 +413,15 @@ func (c *Comparator) diffForeignKey(
 		return true
 	}
 
-	if key1.OnUpdate() != key2.OnUpdate() {
+	if cmp.Equal(key1.OnUpdate(), key2.OnUpdate()) == false {
 		return true
 	}
 
-	return key1.OnDelete() != key2.OnDelete()
+	if cmp.Equal(key1.OnDelete(), key2.OnDelete()) == false {
+		return true
+	}
+
+	return false
 }
 
 // columnsEqual - Compares the definitions of the given columns

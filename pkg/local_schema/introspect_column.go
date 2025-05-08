@@ -8,8 +8,11 @@ import (
 type columnData struct {
 	ColumnName   string
 	IsPrimaryKey bool
-	IsForeignKey bool
 	IsNotNull    bool
+
+	IsForeignKey bool
+	OnDelete     *string
+	OnUpdate     *string
 
 	TypeName string
 

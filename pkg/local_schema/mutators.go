@@ -11,11 +11,19 @@ func applyMetadataMutatorsForNewColumn(
 	bag *tableBag,
 ) {
 	if columnTagsData.IsForeignKey {
+		options := map[string]any{}
+		if columnTagsData.OnUpdate != nil {
+			options["onUpdate"] = columnTagsData.OnUpdate
+		}
+		if columnTagsData.OnDelete != nil {
+			options["onDelete"] = columnTagsData.OnDelete
+		}
+
 		bag.table.AddForeignKeyConstraint(
 			getName(bag.store, columnTagsData.TypeName),
 			[]string{columnTagsData.ColumnName},
 			[]string{"id"},
-			nil,
+			options,
 			nil,
 		)
 	}

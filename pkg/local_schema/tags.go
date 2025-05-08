@@ -16,6 +16,8 @@ const (
 	primaryKeyTagName                = "pk"
 	isNullableTagName                = "nullable"
 	lengthTagName                    = "length"
+	onUpdateTagName                  = "on_update"
+	onDeleteTagName                  = "on_delete"
 	uniqueConstraintTagName          = "uniq"
 	uniqueConstraintConditionTagName = "uniq_cond"
 	indexTagName                     = "index"
@@ -35,6 +37,16 @@ func (t *tableBag) parseColumnTags(
 	columnName := colNameTag.Value()
 
 	isForeignKey := slices.Contains(objectsKeys, typeName)
+	onUpdateTag, _ := tags.Get(onUpdateTagName)
+	var onUpdate *string
+	if onUpdateTag != nil {
+		onUpdate = utils.AsPtr(onUpdateTag.Value())
+	}
+	onDeleteTag, _ := tags.Get(onDeleteTagName)
+	var onDelete *string
+	if onDeleteTag != nil {
+		onDelete = utils.AsPtr(onDeleteTag.Value())
+	}
 
 	pk, _ := tags.Get(primaryKeyTagName)
 	isPrimaryKey := pk != nil
@@ -145,6 +157,8 @@ func (t *tableBag) parseColumnTags(
 		ColumnName:        columnName,
 		IsPrimaryKey:      isPrimaryKey,
 		IsForeignKey:      isForeignKey,
+		OnUpdate:          onUpdate,
+		OnDelete:          onDelete,
 		IsNotNull:         isNotNull,
 		TypeName:          typeName,
 		IsUnique:          isUnique,

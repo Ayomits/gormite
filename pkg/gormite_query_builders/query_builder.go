@@ -111,10 +111,15 @@ type QueryBuilder[ResultType any] struct {
 	//@param Connection connection The DBAL Connection.
 	connection *platforms.Connection
 	D          gormite_databases.PostgresDatabaseInterface
+	ctx        context.Context
 }
 
 // NewQueryBuilder - Initializes a new <tt>QueryBuilder</tt>.
 func NewQueryBuilder[ResultType any](d gormite_databases.PostgresDatabaseInterface) *QueryBuilder[ResultType] {
+	return NewQueryBuilderWithContext[ResultType](context.Background(), d)
+}
+
+func NewQueryBuilderWithContext[ResultType any](ctx context.Context, d gormite_databases.PostgresDatabaseInterface) *QueryBuilder[ResultType] {
 	return &QueryBuilder[ResultType]{
 		sql:          nil,
 		params:       make(map[string]interface{}),
@@ -140,7 +145,8 @@ func NewQueryBuilder[ResultType any](d gormite_databases.PostgresDatabaseInterfa
 			d,
 			postgres_platform.NewPostgreSQLPlatform(),
 		),
-		D: d,
+		D:   d,
+		ctx: ctx,
 	}
 }
 
@@ -1226,15 +1232,19 @@ func (qb *QueryBuilder[ResultType]) Clone() *QueryBuilder[ResultType] {
 	return &cloned
 }
 
-func (qb *QueryBuilder[ResultType]) Exec() error {
-	ctx := context.Background()
+func CloneTo[New any, Old any](oldQb *QueryBuilder[Old]) *QueryBuilder[New] {
+	newQb := QueryBuilder[New](*oldQb)
 
+	return newQb.Clone()
+}
+
+func (qb *QueryBuilder[ResultType]) Exec() error {
 	gotSql, err := qb.GetSQL()
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	_, err = qb.D.Exec(ctx, gotSql, qb.GetNamedArgs())
+	_, err = qb.D.Exec(qb.ctx, gotSql, qb.GetNamedArgs())
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -1243,14 +1253,12 @@ func (qb *QueryBuilder[ResultType]) Exec() error {
 }
 
 func (qb *QueryBuilder[ResultType]) ExecScan(v interface{}) error {
-	ctx := context.Background()
-
 	gotSql, err := qb.GetSQL()
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	err = qb.D.Select(gotSql, qb.GetNamedArgs()).Scan(v).Exec(ctx)
+	err = qb.D.Select(gotSql, qb.GetNamedArgs()).Scan(v).Exec(qb.ctx)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -1270,14 +1278,12 @@ func ExecOrErr[ResultType any](
 }
 
 func (qb *QueryBuilder[ResultType]) ExecScanCol(v interface{}) error {
-	ctx := context.Background()
-
 	gotSql, err := qb.GetSQL()
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	err = qb.D.Select(gotSql, qb.GetNamedArgs()).ScanCol(v).Exec(ctx)
+	err = qb.D.Select(gotSql, qb.GetNamedArgs()).ScanCol(v).Exec(qb.ctx)
 	if err != nil {
 		return errors.WithStack(err)
 	}

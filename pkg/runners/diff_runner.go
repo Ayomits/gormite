@@ -1,6 +1,7 @@
 package runners
 
 import (
+	"context"
 	"fmt"
 	"github.com/KoNekoD/gormite/pkg/diff_calc"
 	"github.com/KoNekoD/gormite/pkg/gormite_databases"
@@ -43,8 +44,8 @@ func NewDiffRunner(opts DiffRunnerOptions) *DiffRunner {
 	return &DiffRunner{opts: opts}
 }
 
-func (r *DiffRunner) Run() error {
-	d := gormite_databases.NewPostgresDatabase(r.opts.Dsn)
+func (r *DiffRunner) Run(ctx context.Context) error {
+	d := gormite_databases.NewPostgresDatabase(ctx, r.opts.Dsn)
 
 	p := postgres_platform.NewPostgreSQLPlatform()
 

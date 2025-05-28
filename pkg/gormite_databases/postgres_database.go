@@ -42,9 +42,7 @@ type PostgresDatabaseInterface interface {
 
 // todo: сделать интерфейс-обертку чтобы можно было использовать транзакцию в качестве основы
 
-func NewPostgresDatabase(dsn string) *PostgresDatabase {
-	ctx := context.Background()
-
+func NewPostgresDatabase(ctx context.Context, dsn string) *PostgresDatabase {
 	// TODO: Move to util func
 	module := "storage"
 	opts := log.Options{

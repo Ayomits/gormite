@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/KoNekoD/gormite/pkg/runners"
 	"github.com/gookit/goutil/cflag"
 	"github.com/pkg/errors"
@@ -15,6 +16,7 @@ func toolValidate(val any) (err error) {
 }
 
 func main() {
+	ctx := context.Background()
 	opts := runners.DiffRunnerOptions{}
 
 	c := cflag.New(func(c *cflag.CFlags) { c.Desc = "Create migrations diff" })
@@ -41,7 +43,9 @@ func main() {
 
 	c.AddValidator("tool", toolValidate)
 
-	c.Func = func(c *cflag.CFlags) error { return runners.NewDiffRunner(opts).Run() }
+	c.Func = func(c *cflag.CFlags) error {
+		return runners.NewDiffRunner(opts).Run(ctx)
+	}
 
 	c.MustParse(nil)
 }

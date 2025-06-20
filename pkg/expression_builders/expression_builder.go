@@ -219,3 +219,17 @@ func (b *ExpressionBuilder) In(x string, y []string) string {
 func (b *ExpressionBuilder) NotIn(x string, y []string) string {
 	return b.Comparison(x, "NOT IN", "("+strings.Join(y, ", ")+")")
 }
+
+// Exists - Creates an EXISTS (subquery) expression.
+//
+// subquery - The SQL subquery to be checked for existence.
+func (b *ExpressionBuilder) Exists(subquery string) string {
+	return "EXISTS (" + subquery + ")"
+}
+
+// NotExists - Creates a NOT EXISTS (subquery) expression.
+//
+// subquery - The SQL subquery to be checked for non-existence.
+func (b *ExpressionBuilder) NotExists(subquery string) string {
+	return "NOT EXISTS (" + subquery + ")"
+}

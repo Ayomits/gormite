@@ -9,10 +9,11 @@ import (
 // BuiltinTypesMap - The map of supported doctrine mapping types.
 var BuiltinTypesMap = map[enums.TypesType]AbstractTypeInterface{
 	enums.TypeAsciiString:         &AsciiStringType{StringType: NewStringType()},
-	enums.TypeBigint:              &BigintType{AbstractType: &AbstractType{}},
+	enums.TypeBigint:              NewBigintType(),
 	enums.TypeBoolean:             NewBooleanType(),
-	enums.TypeDecimal:             &DecimalType{AbstractType: &AbstractType{}},
-	enums.TypeFloat:               &FloatType{AbstractType: &AbstractType{}},
+	enums.TypeDecimal:             NewDecimalType(),
+	enums.TypeFloat:               NewFloatType(),
+	enums.TypeSmallfloat:          NewSmallFloatType(),
 	enums.TypeInteger:             NewIntegerType(),
 	enums.TypeJson:                NewJsonType(),
 	enums.TypeString:              NewStringType(),
@@ -28,7 +29,6 @@ var BuiltinTypesMap = map[enums.TypesType]AbstractTypeInterface{
 	enums.TypeDatetimetzImmutable: &DateTimeTzImmutableType{AbstractType: &AbstractType{}},
 	enums.TypeGuid:                &GuidType{StringType: NewStringType()},
 	enums.TypeSimpleArray:         &SimpleArrayType{AbstractType: &AbstractType{}},
-	enums.TypeSmallfloat:          &SmallFloatType{AbstractType: &AbstractType{}},
 	enums.TypeSmallint:            &SmallIntType{AbstractType: &AbstractType{}},
 	enums.TypeTimeMutable:         &TimeType{AbstractType: &AbstractType{}},
 	enums.TypeTimeImmutable:       &TimeImmutableType{AbstractType: &AbstractType{}},

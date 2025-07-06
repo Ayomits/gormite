@@ -1,10 +1,14 @@
 package types
 
 import (
-	"fmt"
+	"strconv"
 )
 
 type DecimalType struct{ *AbstractType }
+
+func NewDecimalType() *DecimalType {
+	return &DecimalType{AbstractType: &AbstractType{}}
+}
 
 func (d *DecimalType) GetSQLDeclaration(
 	column map[string]interface{},
@@ -12,10 +16,22 @@ func (d *DecimalType) GetSQLDeclaration(
 ) string {
 	return platform.GetDecimalTypeDeclarationSQL(column)
 }
-func (d *DecimalType) ConvertToPHPValue(value any, platform TypesPlatform) any {
-	switch v := value.(type) {
-	case float32, float64, int:
-		return fmt.Sprintf("%f", v)
+
+func (d *DecimalType) ConvertToPHPValue(value any, _ TypesPlatform) any {
+	if value == nil {
+		return nil
 	}
-	return value
+
+	if v, ok := value.(string); ok {
+		if v == "" {
+			return nil
+		}
+		v, err := strconv.ParseFloat(v, 64)
+		if err != nil {
+			panic(err)
+		}
+		return &v
+	}
+
+	panic("unknown type")
 }

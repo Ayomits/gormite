@@ -119,6 +119,12 @@ func (t *tableBag) parseColumnTags(
 			columnType = types.NewIntegerType()
 		case "bigint":
 			columnType = types.NewBigintType()
+		case "decimal":
+			columnType = types.NewDecimalType()
+		case "float":
+			columnType = types.NewFloatType()
+		case "smallfloat":
+			columnType = types.NewSmallFloatType()
 		default:
 			panic(
 				fmt.Sprintf(
@@ -138,6 +144,10 @@ func (t *tableBag) parseColumnTags(
 			columnType = types.NewStringType()
 		case "bool":
 			columnType = types.NewBooleanType()
+		case "float32":
+			columnType = types.NewSmallFloatType()
+		case "float64":
+			columnType = types.NewFloatType()
 		}
 	}
 

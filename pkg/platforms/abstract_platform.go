@@ -1032,17 +1032,21 @@ func (parent *AbstractPlatform) GetDecimalTypeDeclarationSQL(column map[string]i
 	scale, hasScale := column[`scale`]
 
 	e := ""
-	if !hasPrecision {
-		e = "ColumnPrecisionRequired"
-	} else if !hasScale {
-		e = "ColumnScaleRequired"
+	if !hasPrecision || precision.(*int) == nil {
+		columnName := column[`name`].(string)
+		e = fmt.Sprintf("column %s precision required", columnName)
+	} else if !hasScale || scale.(*int) == nil {
+		columnName := column[`name`].(string)
+		e = fmt.Sprintf("column %s scale required", columnName)
 	}
-
 	if e != "" {
 		panic("InvalidColumnDeclaration " + e)
 	}
 
-	return `NUMERIC(` + precision.(string) + `, ` + scale.(string) + `)`
+	precisionStr := strconv.Itoa(*(precision.(*int)))
+	scaleStr := strconv.Itoa(*(scale.(*int)))
+
+	return `NUMERIC(` + precisionStr + `, ` + scaleStr + `)`
 }
 
 func (parent *AbstractPlatform) GetDefaultValueDeclarationSQL(column map[string]interface{}) string {

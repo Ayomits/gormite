@@ -30,7 +30,7 @@ func WithColumnPrecision(precision *int) ColumnOption {
 	}
 }
 
-func WithColumnScale(scale int) ColumnOption {
+func WithColumnScale(scale *int) ColumnOption {
 	return func(c *Column) {
 		c.scale = scale
 	}
@@ -61,7 +61,7 @@ type Column struct {
 	columnType       types.AbstractTypeInterface
 	length           *int
 	precision        *int
-	scale            int
+	scale            *int
 	unsigned         bool
 	fixed            bool
 	notnull          bool
@@ -115,7 +115,7 @@ func (c *Column) SetPrecision(precision int) *Column {
 }
 
 func (c *Column) SetScale(scale int) *Column {
-	c.scale = scale
+	c.scale = &scale
 	return c
 }
 
@@ -166,7 +166,7 @@ func (c *Column) GetPrecision() *int {
 	return c.precision
 }
 
-func (c *Column) GetScale() int {
+func (c *Column) GetScale() *int {
 	return c.scale
 }
 

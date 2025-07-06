@@ -24,6 +24,8 @@ const (
 	indexConditionTagName            = "index_cond"
 	defaultValueTagName              = "default"
 	typeTagName                      = "type"
+	precisionTagName                 = "precision"
+	scaleTagName                     = "scale"
 )
 
 func (t *tableBag) parseColumnTags(
@@ -121,6 +123,23 @@ func (t *tableBag) parseColumnTags(
 			columnType = types.NewBigintType()
 		case "decimal":
 			columnType = types.NewDecimalType()
+			precisionTag, _ := tags.Get(precisionTagName)
+			if precisionTag != nil {
+				precisionTagValue, _ := strconv.Atoi(precisionTag.Value())
+				options = append(
+					options,
+					func(c *assets.Column) { c.SetPrecision(precisionTagValue) },
+				)
+			}
+			scaleTag, _ := tags.Get(scaleTagName)
+			if scaleTag != nil {
+				scaleTagValue, _ := strconv.Atoi(scaleTag.Value())
+				options = append(
+					options,
+					func(c *assets.Column) { c.SetScale(scaleTagValue) },
+				)
+			}
+
 		case "float":
 			columnType = types.NewFloatType()
 		case "smallfloat":

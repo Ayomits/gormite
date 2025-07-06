@@ -107,11 +107,25 @@ func (c *ColumnDiff) HasFixedChanged() bool {
 }
 
 func (c *ColumnDiff) HasPrecisionChanged() bool {
-	return c.oldColumn.GetPrecision() != c.newColumn.GetPrecision()
+	oldPrecision := c.oldColumn.GetPrecision()
+	newPrecision := c.newColumn.GetPrecision()
+
+	if oldPrecision == nil || newPrecision == nil {
+		return oldPrecision != newPrecision
+	}
+
+	return *oldPrecision != *newPrecision
 }
 
 func (c *ColumnDiff) HasScaleChanged() bool {
-	return c.oldColumn.GetScale() != c.newColumn.GetScale()
+	oldScale := c.oldColumn.GetScale()
+	newScale := c.newColumn.GetScale()
+
+	if oldScale == nil || newScale == nil {
+		return oldScale != newScale
+	}
+
+	return *oldScale != *newScale
 }
 
 func (c *ColumnDiff) HasNotNullChanged() bool {

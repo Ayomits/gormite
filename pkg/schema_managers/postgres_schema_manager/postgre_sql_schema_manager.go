@@ -195,7 +195,7 @@ func (m *PostgreSQLSchemaManager) GetPortableTableColumnDefinition(tableColumn *
 	fixed := false
 
 	var precision *int
-	scale := 0
+	var scale *int
 	var jsonb *bool
 
 	dbType := strings.ToLower(tableColumn.Type)
@@ -230,7 +230,8 @@ func (m *PostgreSQLSchemaManager) GetPortableTableColumnDefinition(tableColumn *
 		if len(matches) > 2 {
 			precisionInt, _ := strconv.Atoi(matches[2])
 			precision = utils.AsPtr(precisionInt)
-			scale, _ = strconv.Atoi(matches[3])
+			scaleInt, _ := strconv.Atoi(matches[3])
+			scale = utils.AsPtr(scaleInt)
 			length = nil
 		}
 	case "year":

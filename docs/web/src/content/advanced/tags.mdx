@@ -36,4 +36,4 @@
 \- if set then column has default value
 * **type**
 
-\- if set then column has type(manually set, without struct property type checking), Possible types: text, varchar, json, jsonb, integer, bigint, decimal(scale and precision tags also must be set, examples: `F3 float32 `db:"f3" type:"decimal" precision:"10" scale:"2"`  // [-99999999.99, 99999999.99]` or `F4 float64 `db:"f4" type:"decimal" precision:"20" scale:"10"` // [-9_999_999_999.9999999999, +9_999_999_999.9999999999]`), float, smallfloat
+\- if set then column has type(manually set, without struct property type checking), Possible types: text, varchar, json, jsonb, integer, bigint, decimal(scale and precision tags also must be set, examples: `F3 float32 `db:"f3" type:"decimal" precision:"10" scale:"2"`  // [-99999999.99, 99999999.99]` or `F4 float64 `db:"f4" type:"decimal" precision:"20" scale:"10"` // [-9_999_999_999.9999999999, +9_999_999_999.9999999999]`), float(or just use float64), smallfloat(or just use float32)

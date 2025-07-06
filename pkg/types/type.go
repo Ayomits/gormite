@@ -9,7 +9,7 @@ import (
 // BuiltinTypesMap - The map of supported doctrine mapping types.
 var BuiltinTypesMap = map[enums.TypesType]AbstractTypeInterface{
 	enums.TypeAsciiString:         &AsciiStringType{StringType: NewStringType()},
-	enums.TypeBigint:              &BigIntType{AbstractType: &AbstractType{}},
+	enums.TypeBigint:              &BigintType{AbstractType: &AbstractType{}},
 	enums.TypeBoolean:             NewBooleanType(),
 	enums.TypeDecimal:             &DecimalType{AbstractType: &AbstractType{}},
 	enums.TypeFloat:               &FloatType{AbstractType: &AbstractType{}},
@@ -45,8 +45,7 @@ type AbstractTypeInterface interface {
 
 var typeRegistry *TypeRegistry
 
-type AbstractType struct {
-}
+type AbstractType struct{}
 
 func (a *AbstractType) NewAbstractType() *AbstractType {
 	return &AbstractType{}

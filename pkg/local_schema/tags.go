@@ -117,6 +117,8 @@ func (t *tableBag) parseColumnTags(
 			)
 		case "integer":
 			columnType = types.NewIntegerType()
+		case "bigint":
+			columnType = types.NewBigintType()
 		default:
 			panic(
 				fmt.Sprintf(

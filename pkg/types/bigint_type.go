@@ -6,19 +6,24 @@ import (
 	"strconv"
 )
 
-type BigIntType struct{ *AbstractType }
+type BigintType struct{ *AbstractType }
 
-func (b *BigIntType) GetSQLDeclaration(
+func NewBigintType() *BigintType {
+	return &BigintType{AbstractType: &AbstractType{}}
+}
+
+func (b *BigintType) GetSQLDeclaration(
 	column map[string]interface{},
 	platform TypesPlatform,
 ) string {
 	return platform.GetBigIntTypeDeclarationSQL(column)
 }
-func (b *BigIntType) GetBindingType() enums.ParameterType {
+
+func (b *BigintType) GetBindingType() enums.ParameterType {
 	return enums.ParameterTypeString
 }
 
-func (b *BigIntType) ConvertToPHPValue(value any, platform TypesPlatform) any {
+func (b *BigintType) ConvertToPHPValue(value any, platform TypesPlatform) any {
 	if value == nil {
 		return value
 	}

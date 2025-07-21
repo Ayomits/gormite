@@ -3,7 +3,7 @@ package diff_calc
 import (
 	"github.com/KoNekoD/gormite/pkg/assets"
 	"github.com/KoNekoD/gormite/pkg/diff_dtos"
-	"github.com/KoNekoD/gormite/pkg/utils"
+	"github.com/KoNekoD/smt/pkg/smt"
 	"github.com/google/go-cmp/cmp"
 	"maps"
 	"slices"
@@ -394,16 +394,16 @@ func (c *Comparator) diffForeignKey(
 	key2 *assets.ForeignKeyConstraint,
 ) bool {
 	same := slices.Equal(
-		utils.MapSlice(key1.GetUnquotedLocalColumns(), strings.ToLower),
-		utils.MapSlice(key2.GetUnquotedLocalColumns(), strings.ToLower),
+		smt.MapSlice(key1.GetUnquotedLocalColumns(), strings.ToLower),
+		smt.MapSlice(key2.GetUnquotedLocalColumns(), strings.ToLower),
 	)
 	if !same {
 		return true
 	}
 
 	same = slices.Equal(
-		utils.MapSlice(key1.GetUnquotedForeignColumns(), strings.ToLower),
-		utils.MapSlice(key2.GetUnquotedForeignColumns(), strings.ToLower),
+		smt.MapSlice(key1.GetUnquotedForeignColumns(), strings.ToLower),
+		smt.MapSlice(key2.GetUnquotedForeignColumns(), strings.ToLower),
 	)
 	if !same {
 		return true

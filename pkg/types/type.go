@@ -3,7 +3,7 @@ package types
 import (
 	"fmt"
 	"github.com/KoNekoD/gormite/pkg/enums"
-	"github.com/KoNekoD/gormite/pkg/utils"
+	"github.com/KoNekoD/smt/pkg/smt"
 )
 
 // BuiltinTypesMap - The map of supported doctrine mapping types.
@@ -103,7 +103,7 @@ func (a *AbstractType) GetBindingType() enums.ParameterType {
 }
 func GetTypesMap() map[enums.TypesType]string {
 	registry := GetTypeRegistry()
-	return utils.Map(
+	return smt.Map(
 		registry.GetMap(),
 		func(t1 enums.TypesType, t2 AbstractTypeInterface) string {
 			return fmt.Sprintf("%T", t2)

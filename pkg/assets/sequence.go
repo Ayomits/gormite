@@ -109,9 +109,3 @@ func (s *Sequence) IsAutoIncrementsFor(table *Table) bool {
 
 	return tableSequenceName == sequenceName
 }
-
-func (s *Sequence) Clone() *Sequence {
-	cloned := *s
-
-	return &cloned
-}

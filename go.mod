@@ -7,6 +7,7 @@ toolchain go1.24.4
 require (
 	github.com/KoNekoD/go-snaps v0.0.10
 	github.com/KoNekoD/ptrs v0.0.2
+	github.com/KoNekoD/smt v0.0.1
 	github.com/charmbracelet/log v0.4.0
 	github.com/elliotchance/orderedmap/v3 v3.1.0
 	github.com/elliotchance/pie/v2 v2.9.1

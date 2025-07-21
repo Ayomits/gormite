@@ -8,8 +8,8 @@ import (
 	"github.com/KoNekoD/gormite/pkg/dtos"
 	"github.com/KoNekoD/gormite/pkg/platforms"
 	"github.com/KoNekoD/gormite/pkg/schema_managers"
-	"github.com/KoNekoD/gormite/pkg/utils"
 	"github.com/KoNekoD/ptrs/pkg/ptrs"
+	"github.com/KoNekoD/smt/pkg/smt"
 	"golang.org/x/exp/maps"
 	"slices"
 	"strings"
@@ -31,7 +31,7 @@ func NewAbstractSchemaManager(
 }
 
 func (m *AbstractSchemaManager) ListDatabases() []string {
-	return utils.MapSlice(
+	return smt.MapSlice(
 		m.Connection.FetchAllAssociative(m.Platform.GetListDatabasesSQL()),
 		func(t map[string]interface{}) string {
 			return m.Child.GetPortableDatabaseDefinition(t)
@@ -46,7 +46,7 @@ func (m *AbstractSchemaManager) ListSchemaNames() []string {
 func (m *AbstractSchemaManager) ListSequences() []*assets.Sequence {
 	typedData := make([]dtos.ListSequencesDto, 0)
 
-	return utils.MapSlice(
+	return smt.MapSlice(
 		platforms.Fetch(
 			m.Connection,
 			m.Platform.GetListSequencesSQL(m.getDatabase()),
@@ -84,12 +84,12 @@ func (m *AbstractSchemaManager) ListTableIndexes(table string) map[string]*asset
 }
 
 func (m *AbstractSchemaManager) TablesExist(names []string) bool {
-	names = utils.MapSlice(names, strings.ToLower)
+	names = smt.MapSlice(names, strings.ToLower)
 
 	return len(names) == len(
-		utils.ArrayIntersect(
+		smt.SliceIntersect(
 			names,
-			utils.MapSlice(m.ListTableNames(), strings.ToLower),
+			smt.MapSlice(m.ListTableNames(), strings.ToLower),
 		),
 	)
 }
@@ -99,7 +99,7 @@ func (m *AbstractSchemaManager) tableExists(tableName string) bool {
 }
 
 func (m *AbstractSchemaManager) ListTableNames() []string {
-	return utils.MapSlice(
+	return smt.MapSlice(
 		m.Child.SelectTableNames(m.getDatabase()),
 		func(t *dtos.SelectTableNamesDto) string {
 			return m.Child.GetPortableTableDefinition(t)
@@ -187,7 +187,7 @@ func (m *AbstractSchemaManager) IntrospectTable(name string) *assets.Table {
 }
 
 func (m *AbstractSchemaManager) ListViews() []*assets.View {
-	return utils.MapSlice(
+	return smt.MapSlice(
 		m.Connection.FetchAllAssociative(m.Platform.GetListViewsSQL(m.getDatabase())),
 		func(t map[string]interface{}) *assets.View {
 			return m.Child.GetPortableViewDefinition(t)

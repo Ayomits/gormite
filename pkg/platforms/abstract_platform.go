@@ -847,7 +847,7 @@ func (parent *AbstractPlatform) GetDropSchemaSQL(schemaName string) string {
 func (parent *AbstractPlatform) QuoteIdentifier(identifier string) string {
 	a := parent.child
 	if strings.Contains(identifier, `.`) {
-		parts := utils.MapSlice(
+		parts := smt.MapSlice(
 			strings.Split(identifier, `.`),
 			a.QuoteSingleIdentifier,
 		)

@@ -52,3 +52,10 @@ type UserProfile struct {
 ```
 
 Once you have prepared the entities and YAML file, Gormite analyzes the structures and generates SQL migrations, taking everything into account
+
+### TODO
+
+- [ ] Avoid panics logic
+- [ ] Refactor the code
+- [ ] Add more tests
+- [ ] `interface{}` to `any`

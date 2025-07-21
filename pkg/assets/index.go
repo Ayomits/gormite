@@ -1,7 +1,7 @@
 package assets
 
 import (
-	"github.com/KoNekoD/gormite/pkg/utils"
+	"github.com/KoNekoD/smt/pkg/smt"
 	"github.com/gookit/goutil/arrutil"
 	"golang.org/x/exp/maps"
 	"slices"
@@ -11,17 +11,18 @@ import (
 type Index struct {
 	*AbstractAsset
 
-	// columns - Asset identifier instances of the column names the index is associated with.
+	// columns Asset identifier instances of the column names
+	// the index is associated with
 	columns map[string]*Identifier
 
 	isPrimary bool
 
 	isUnique bool
 
-	// flags - Platform specific flags for indexes.
+	// flags Platform specific flags for indexes
 	flags map[string]bool
 
-	options map[string]interface{}
+	options map[string]any
 }
 
 func NewIndex(
@@ -30,7 +31,7 @@ func NewIndex(
 	isUnique bool,
 	isPrimary bool,
 	flags []string,
-	options map[string]interface{},
+	options map[string]any,
 ) *Index {
 	isUnique = isUnique || isPrimary
 
@@ -63,7 +64,8 @@ func (i *Index) addColumn(column string) {
 	i.columns[column] = NewIdentifier(column)
 }
 
-// GetColumns - Returns the names of the referencing table columns the constraint is associated with.
+// GetColumns Returns the names of the referencing table columns the
+// constraint is associated with
 func (i *Index) GetColumns() []string {
 	return maps.Keys(i.columns)
 }
@@ -78,10 +80,11 @@ func (i *Index) GetColumn(key string) *Identifier {
 	return v
 }
 
-// GetQuotedColumns - Returns the quoted representation of the column names the constraint is associated with.
+// GetQuotedColumns Returns the quoted representation of the
+// column names the constraint is associated with
 // But only if they were defined with one or a column name
-// is a keyword reserved by the platform.
-// Otherwise, the plain unquoted value as inserted is returned.
+// is a keyword reserved by the platform
+// Otherwise, the plain unquoted value as inserted is returned
 func (i *Index) GetQuotedColumns(platform AssetsPlatform) []string {
 	subParts := make([]string, 0)
 
@@ -89,10 +92,11 @@ func (i *Index) GetQuotedColumns(platform AssetsPlatform) []string {
 		subParts = i.GetOption("lengths").([]string)
 	}
 
+	var length *string
 	columns := make([]string, 0)
 
 	for _, column := range i.columns {
-		length := utils.ArrayShift(subParts)
+		length, subParts = smt.SliceShift(subParts)
 
 		quotedColumn := column.GetQuotedName(platform)
 
@@ -116,7 +120,7 @@ func (i *Index) GetUnquotedColumns() []string {
 	return columns
 }
 
-// IsSimpleIndex - Is the index neither unique nor primary key?
+// IsSimpleIndex Is the index neither unique nor primary key?
 func (i *Index) IsSimpleIndex() bool {
 	return !i.IsPrimary() && !i.IsUnique()
 }
@@ -137,10 +141,11 @@ func (i *Index) HasColumnAtPosition(name string, pos int) bool {
 		indexColumns = append(indexColumns, strings.ToLower(s))
 	}
 
-	return utils.ArraySearch(name, indexColumns) == pos
+	return smt.SliceSearch(name, indexColumns) == pos
 }
 
-// SpansColumns - Checks if this index exactly spans the given column names in the correct order.
+// SpansColumns Checks if this index exactly spans the given
+// column names in the correct order
 func (i *Index) SpansColumns(columnNames []string) bool {
 	columns := i.GetColumns()
 	numberOfColumns := len(columns)
@@ -150,9 +155,13 @@ func (i *Index) SpansColumns(columnNames []string) bool {
 	slices.Sort(columnNames)
 
 	for j := 0; j < numberOfColumns; j++ {
-		if len(columnNames) > j &&
-			i.trimQuotes(strings.ToLower(columns[j])) == i.trimQuotes(strings.ToLower(columnNames[j])) {
-			continue
+		if len(columnNames) > j {
+			indexColumn := i.trimQuotes(strings.ToLower(columns[j]))
+			inputColumn := i.trimQuotes(strings.ToLower(columnNames[j]))
+
+			if indexColumn == inputColumn {
+				continue
+			}
 		}
 
 		sameColumns = false
@@ -161,10 +170,12 @@ func (i *Index) SpansColumns(columnNames []string) bool {
 	return sameColumns
 }
 
-// isFulfilledBy - Checks if the other index already fulfills all the indexing and constraint needs of the current one.
+// IsFulfilledBy Checks if the other index already fulfills all the
+// indexing and constraint needs of the current one
 func (i *Index) IsFulfilledBy(other *Index) bool {
-	// allow the other index to be equally large only. It being larger is an option,
-	// but it creates a problem with scenarios of the kind PRIMARY KEY(foo,bar) UNIQUE(foo)
+	// allow the other index to be equally large only
+	// It being larger is an option, but it creates a problem with
+	// scenarios of the kind PRIMARY KEY(foo,bar) UNIQUE(foo)
 	if len(other.GetColumns()) != len(i.GetColumns()) {
 		return false
 	}
@@ -199,7 +210,8 @@ func (i *Index) IsFulfilledBy(other *Index) bool {
 	return false
 }
 
-// overrules - Detects if the other index is a non-unique, non primary index that can be overwritten by this one.
+// overrules Detects if the other index is a non-unique, non-primary
+// index that can be overwritten by this one
 func (i *Index) overrules(other *Index) bool {
 	if other.IsPrimary() {
 		return false
@@ -209,29 +221,31 @@ func (i *Index) overrules(other *Index) bool {
 		return false
 	}
 
-	return i.SpansColumns(other.GetColumns()) && (i.IsPrimary() || i.IsUnique()) && i.samePartialIndex(other)
+	return i.SpansColumns(other.GetColumns()) &&
+		(i.IsPrimary() || i.IsUnique()) &&
+		i.samePartialIndex(other)
 }
 
-// GetFlags - Returns platform specific flags for indexes.
+// GetFlags Returns platform specific flags for indexes
 func (i *Index) GetFlags() []string {
 	return maps.Keys(i.flags)
 }
 
-// AddFlag - Adds Flag for an index that translates to platform specific handling.
+// AddFlag Adds Flag for an index that translates to platform specific handling
 func (i *Index) AddFlag(flag string) *Index {
 	i.flags[strings.ToLower(flag)] = true
 
 	return i
 }
 
-// HasFlag - Does this index have a specific flag?
+// HasFlag Does this index have a specific flag?
 func (i *Index) HasFlag(flag string) bool {
 	_, ok := i.flags[strings.ToLower(flag)]
 
 	return ok
 }
 
-// RemoveFlag - Removes a flag.
+// RemoveFlag Removes a flag.
 func (i *Index) RemoveFlag(flag string) {
 	delete(i.flags, strings.ToLower(flag))
 }
@@ -242,7 +256,7 @@ func (i *Index) HasOption(name string) bool {
 	return ok
 }
 
-func (i *Index) GetOption(name string) interface{} {
+func (i *Index) GetOption(name string) any {
 	v, ok := i.options[strings.ToLower(name)]
 
 	if !ok {
@@ -252,20 +266,22 @@ func (i *Index) GetOption(name string) interface{} {
 	return v
 }
 
-func (i *Index) GetOptions() map[string]interface{} {
+func (i *Index) GetOptions() map[string]any {
 	return i.options
 }
 
-// samePartialIndex - Return whether the two indexes have the same partial index
+// samePartialIndex Return whether the two indexes have the same partial index
 func (i *Index) samePartialIndex(other *Index) bool {
-	if i.HasOption("where") && other.HasOption("where") && i.GetOption("where") == other.GetOption("where") {
+	if i.HasOption("where") && other.HasOption("where") &&
+		i.GetOption("where") == other.GetOption("where") {
 		return true
 	}
 
 	return !i.HasOption("where") && !other.HasOption("where")
 }
 
-// hasSameColumnLengths - Returns whether the index has the same column lengths as the other
+// hasSameColumnLengths Returns whether the index has the
+// same column lengths as the other
 func (i *Index) hasSameColumnLengths(other *Index) bool {
 	filter := func(length *int) bool {
 		return length != nil
@@ -284,10 +300,4 @@ func (i *Index) hasSameColumnLengths(other *Index) bool {
 	)
 
 	return same
-}
-
-func (i *Index) Clone() *Index {
-	clone := *i
-
-	return &clone
 }

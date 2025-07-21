@@ -277,14 +277,3 @@ func (s *Schema) dropSequence(name string) *Schema {
 
 	return s
 }
-
-// Clone - Cloning a Schema triggers a deep clone of all related assets.
-func (s *Schema) Clone() {
-	for k, table := range s.tables {
-		s.tables[k] = table.Clone()
-	}
-
-	for k, sequence := range s.sequences {
-		s.sequences[k] = sequence.Clone()
-	}
-}

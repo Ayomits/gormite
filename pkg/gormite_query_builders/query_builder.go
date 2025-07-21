@@ -11,8 +11,8 @@ import (
 	"github.com/KoNekoD/gormite/pkg/gormite_databases"
 	"github.com/KoNekoD/gormite/pkg/platforms"
 	"github.com/KoNekoD/gormite/pkg/platforms/postgres_platform"
-	"github.com/KoNekoD/gormite/pkg/utils"
 	"github.com/KoNekoD/ptrs/pkg/ptrs"
+	"github.com/KoNekoD/smt/pkg/smt"
 	"github.com/jackc/pgx/v5"
 	"github.com/pkg/errors"
 	"golang.org/x/exp/maps"
@@ -1363,7 +1363,7 @@ func (qb *QueryBuilder[ResultType]) GetResult() ([]*ResultType, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	return utils.MapSlice(v, ptrs.AsPtr), nil
+	return smt.MapSlice(v, ptrs.AsPtr), nil
 }
 
 func (qb *QueryBuilder[ResultType]) GetOneOrNilResult() (*ResultType, error) {

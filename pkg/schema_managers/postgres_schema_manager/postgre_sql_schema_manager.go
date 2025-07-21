@@ -9,6 +9,7 @@ import (
 	"github.com/KoNekoD/gormite/pkg/types"
 	"github.com/KoNekoD/gormite/pkg/utils"
 	"github.com/KoNekoD/ptrs/pkg/ptrs"
+	"github.com/KoNekoD/smt/pkg/smt"
 	"regexp"
 	"slices"
 	"strconv"
@@ -43,7 +44,7 @@ type ListSchemaNamesDto struct {
 func (m *PostgreSQLSchemaManager) ListSchemaNames() []string {
 	typedData := make([]ListSchemaNamesDto, 0)
 
-	return utils.MapSlice(
+	return smt.MapSlice(
 		platforms.Fetch(
 			m.Connection,
 			`
@@ -416,7 +417,7 @@ func (m *PostgreSQLSchemaManager) SelectTableColumns(
 
 	typedData := make([]dtos.SelectTableColumnsDto, 0)
 
-	return utils.MapSlice(
+	return smt.MapSlice(
 		platforms.Fetch(m.Connection, sql, typedData),
 		ptrs.AsPtr,
 	)
@@ -455,7 +456,7 @@ func (m *PostgreSQLSchemaManager) SelectIndexColumns(
 
 	sql += " WHERE " + strings.Join(conditions, " AND ") + ")"
 
-	return utils.MapSlice(
+	return smt.MapSlice(
 		platforms.Fetch(
 			m.Connection,
 			sql,
@@ -477,7 +478,7 @@ AND table_name != 'spatial_ref_sys'
 AND table_type = 'BASE TABLE'
 	`
 
-	return utils.MapSlice(
+	return smt.MapSlice(
 		platforms.Fetch(
 			m.Connection,
 			sql,
@@ -517,7 +518,7 @@ func (m *PostgreSQLSchemaManager) SelectForeignKeyColumns(
 		" AND ",
 	) + ") AND r.contype = 'f'"
 
-	return utils.MapSlice(
+	return smt.MapSlice(
 		platforms.Fetch(
 			m.Connection,
 			sql,
@@ -547,7 +548,7 @@ func (m *PostgreSQLSchemaManager) FetchTableOptionsByTable(
 
 	result := make(map[string]*dtos.FetchTableOptionsByTableDto)
 
-	utils.MapSlice(
+	smt.MapSlice(
 		platforms.Fetch(
 			m.Connection,
 			sql,

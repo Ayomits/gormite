@@ -3,7 +3,7 @@ package assets
 import (
 	"github.com/KoNekoD/gormite/pkg/dtos"
 	"github.com/KoNekoD/gormite/pkg/types"
-	"github.com/KoNekoD/gormite/pkg/utils"
+	"github.com/KoNekoD/smt/pkg/smt"
 	"github.com/elliotchance/orderedmap/v3"
 	"regexp"
 	"slices"
@@ -468,7 +468,7 @@ func (t *Table) RemoveUniqueConstraint(name string) {
 }
 
 func (t *Table) GetColumns() []*Column {
-	return utils.IterToSlice(t.columns.Values())
+	return smt.IterToSlice(t.columns.Values())
 }
 
 // HasColumn - Returns whether this table has a Column with the given name.
@@ -564,25 +564,6 @@ func (t *Table) GetOptions() map[string]interface{} {
 	}
 
 	return t.options
-}
-
-// Clone - Clone of a Table triggers a deep clone of all affected assets.
-func (t *Table) Clone() *Table {
-	cloned := *t
-
-	for k, column := range cloned.columns.AllFromFront() {
-		cloned.columns.Set(k, column.Clone())
-	}
-
-	for k, index := range cloned.indexes {
-		cloned.indexes[k] = index.Clone()
-	}
-
-	for k, fk := range cloned.fkConstraints {
-		cloned.fkConstraints[k] = fk.Clone()
-	}
-
-	return &cloned
 }
 
 func (t *Table) getMaxIdentifierLength() int {

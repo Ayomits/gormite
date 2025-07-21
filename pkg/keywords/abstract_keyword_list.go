@@ -1,7 +1,7 @@
 package keywords
 
 import (
-	"github.com/KoNekoD/gormite/pkg/utils"
+	"github.com/KoNekoD/smt/pkg/smt"
 	"strings"
 )
 
@@ -16,8 +16,8 @@ func NewKeywordList(child KeywordListInterface) *KeywordList {
 }
 
 func (k *KeywordList) InitializeKeywords() {
-	k.keywords = utils.FlipSlice(
-		utils.MapSlice(
+	k.keywords = smt.SliceFlip(
+		smt.MapSlice(
 			k.child.GetKeywords(),
 			strings.ToUpper,
 		),

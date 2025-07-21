@@ -139,12 +139,12 @@ func (c *Column) SetColumnDefault(columnDefault string) *Column {
 	return c
 }
 
-func (c *Column) SetPlatformOptions(platformOptions map[string]interface{}) *Column {
+func (c *Column) SetPlatformOptions(platformOptions map[string]any) *Column {
 	c.platformOptions = platformOptions
 	return c
 }
 
-func (c *Column) SetPlatformOption(name string, value interface{}) *Column {
+func (c *Column) SetPlatformOption(name string, value any) *Column {
 	c.platformOptions[name] = value
 	return c
 }
@@ -186,7 +186,7 @@ func (c *Column) GetColumnDefault() *string {
 	return c.columnDefault
 }
 
-func (c *Column) GetPlatformOptions() map[string]interface{} {
+func (c *Column) GetPlatformOptions() map[string]any {
 	return c.platformOptions
 }
 
@@ -195,7 +195,7 @@ func (c *Column) HasPlatformOption(name string) bool {
 	return ok
 }
 
-func (c *Column) GetPlatformOption(name string) interface{} {
+func (c *Column) GetPlatformOption(name string) any {
 	return c.platformOptions[name]
 }
 
@@ -221,13 +221,13 @@ func (c *Column) GetComment() string {
 	return c.comment
 }
 
-func (c *Column) ToArray() map[string]interface{} {
+func (c *Column) ToArray() map[string]any {
 	columnDefault := ""
 	if c.columnDefault != nil {
 		columnDefault = *c.columnDefault
 	}
 
-	data := map[string]interface{}{
+	data := map[string]any{
 		"name":             c.name,
 		"type":             c.columnType,
 		"default":          columnDefault,
@@ -247,10 +247,4 @@ func (c *Column) ToArray() map[string]interface{} {
 	}
 
 	return data
-}
-
-func (c *Column) Clone() *Column {
-	cloned := *c
-
-	return &cloned
 }

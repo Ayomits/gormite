@@ -2,7 +2,7 @@ package local_schema
 
 import (
 	"fmt"
-	"github.com/KoNekoD/gormite/pkg/utils"
+	"github.com/KoNekoD/ptrs/pkg/ptrs"
 	"strings"
 )
 
@@ -114,6 +114,6 @@ func applyMetadataMutatorsAfterColumnsIntrospection(bag *tableBag) {
 
 	bag.table.SetPrimaryKey(
 		bag.primaryKeys,
-		utils.AsPtr(fmt.Sprintf("%s_pkey", bag.table.GetName())),
+		ptrs.AsPtr(fmt.Sprintf("%s_pkey", bag.table.GetName())),
 	)
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/KoNekoD/gormite/pkg/platforms"
 	"github.com/KoNekoD/gormite/pkg/platforms/postgres_platform"
 	"github.com/KoNekoD/gormite/pkg/utils"
+	"github.com/KoNekoD/ptrs/pkg/ptrs"
 	"github.com/jackc/pgx/v5"
 	"github.com/pkg/errors"
 	"golang.org/x/exp/maps"
@@ -1362,7 +1363,7 @@ func (qb *QueryBuilder[ResultType]) GetResult() ([]*ResultType, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	return utils.MapSlice(v, utils.AsPtr), nil
+	return utils.MapSlice(v, ptrs.AsPtr), nil
 }
 
 func (qb *QueryBuilder[ResultType]) GetOneOrNilResult() (*ResultType, error) {
@@ -1384,7 +1385,7 @@ func (qb *QueryBuilder[ResultType]) GetOneOrNilResult() (*ResultType, error) {
 		return nil, errors.Errorf("expected 1 result, got %d", len(v))
 	}
 
-	return utils.AsPtr(v[0]), nil
+	return ptrs.AsPtr(v[0]), nil
 }
 
 func (qb *QueryBuilder[ResultType]) GetOneOrNilLiteralResult() (
@@ -1401,7 +1402,7 @@ func (qb *QueryBuilder[ResultType]) GetOneOrNilLiteralResult() (
 		return nil, errors.WithStack(err)
 	}
 
-	return utils.AsPtr(v), nil
+	return ptrs.AsPtr(v), nil
 }
 
 func (qb *QueryBuilder[ResultType]) GetLiteralResult() ([]ResultType, error) {

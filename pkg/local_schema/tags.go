@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/KoNekoD/gormite/pkg/assets"
 	"github.com/KoNekoD/gormite/pkg/types"
-	"github.com/KoNekoD/gormite/pkg/utils"
+	"github.com/KoNekoD/ptrs/pkg/ptrs"
 	"github.com/fatih/structtag"
 	"go/ast"
 	"slices"
@@ -42,12 +42,12 @@ func (t *tableBag) parseColumnTags(
 	onUpdateTag, _ := tags.Get(onUpdateTagName)
 	var onUpdate *string
 	if onUpdateTag != nil {
-		onUpdate = utils.AsPtr(onUpdateTag.Value())
+		onUpdate = ptrs.AsPtr(onUpdateTag.Value())
 	}
 	onDeleteTag, _ := tags.Get(onDeleteTagName)
 	var onDelete *string
 	if onDeleteTag != nil {
-		onDelete = utils.AsPtr(onDeleteTag.Value())
+		onDelete = ptrs.AsPtr(onDeleteTag.Value())
 	}
 
 	pk, _ := tags.Get(primaryKeyTagName)
@@ -82,18 +82,18 @@ func (t *tableBag) parseColumnTags(
 	isIndex := indexTag != nil
 	var indexName *string
 	if isIndex && indexTag != nil {
-		indexName = utils.AsPtr(indexTag.Value())
+		indexName = ptrs.AsPtr(indexTag.Value())
 	}
 	indexCondTag, _ := tags.Get(indexConditionTagName)
 	isIndexCondition := indexCondTag != nil
 	var indexCondition *string
 	if isIndexCondition && indexCondTag != nil {
-		indexCondition = utils.AsPtr(indexCondTag.Value())
+		indexCondition = ptrs.AsPtr(indexCondTag.Value())
 	}
 
 	var defaultValue *string
 	if defaultTag, _ := tags.Get(defaultValueTagName); defaultTag != nil {
-		defaultValue = utils.AsPtr(defaultTag.Value())
+		defaultValue = ptrs.AsPtr(defaultTag.Value())
 	}
 
 	var columnType types.AbstractTypeInterface

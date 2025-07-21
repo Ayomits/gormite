@@ -9,6 +9,7 @@ import (
 	"github.com/KoNekoD/gormite/pkg/platforms"
 	"github.com/KoNekoD/gormite/pkg/schema_managers"
 	"github.com/KoNekoD/gormite/pkg/utils"
+	"github.com/KoNekoD/ptrs/pkg/ptrs"
 	"golang.org/x/exp/maps"
 	"slices"
 	"strings"
@@ -65,7 +66,7 @@ func (m *AbstractSchemaManager) ListTableColumns(table string) map[string]*asset
 		database,
 		m.Child.SelectTableColumns(
 			database,
-			utils.AsPtr(m.normalizeName(table)),
+			ptrs.AsPtr(m.normalizeName(table)),
 		),
 	)
 }
@@ -199,7 +200,7 @@ func (m *AbstractSchemaManager) ListTableForeignKeys(table string) []*assets.For
 
 	return m.getPortableTableForeignKeysList(
 		m.Child.SelectForeignKeyColumns(
-			database, utils.AsPtr(m.normalizeName(table)),
+			database, ptrs.AsPtr(m.normalizeName(table)),
 		),
 	)
 }

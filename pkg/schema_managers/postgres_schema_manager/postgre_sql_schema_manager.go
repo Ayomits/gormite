@@ -8,6 +8,7 @@ import (
 	"github.com/KoNekoD/gormite/pkg/schema_managers/abstract_schema_managers"
 	"github.com/KoNekoD/gormite/pkg/types"
 	"github.com/KoNekoD/gormite/pkg/utils"
+	"github.com/KoNekoD/ptrs/pkg/ptrs"
 	"regexp"
 	"slices"
 	"strconv"
@@ -165,7 +166,7 @@ func (m *PostgreSQLSchemaManager) GetPortableTableColumnDefinition(tableColumn *
 		matches := regexp.MustCompile(`\((\d*)\)`).FindStringSubmatch(tableColumn.CompleteType)
 		if len(matches) == 2 {
 			lenInt, _ := strconv.Atoi(matches[1])
-			length = utils.AsPtr(lenInt)
+			length = ptrs.AsPtr(lenInt)
 		}
 	}
 
@@ -213,10 +214,10 @@ func (m *PostgreSQLSchemaManager) GetPortableTableColumnDefinition(tableColumn *
 
 	case "bool", "boolean":
 		if tableColumn.Default != nil && *tableColumn.Default == "true" {
-			tableColumn.Default = utils.AsPtr(`true`)
+			tableColumn.Default = ptrs.AsPtr(`true`)
 		}
 		if tableColumn.Default != nil && *tableColumn.Default == "false" {
-			tableColumn.Default = utils.AsPtr(`false`)
+			tableColumn.Default = ptrs.AsPtr(`false`)
 		}
 		length = nil
 	case "json", "text", "_varchar", "varchar":
@@ -229,21 +230,21 @@ func (m *PostgreSQLSchemaManager) GetPortableTableColumnDefinition(tableColumn *
 
 		if len(matches) > 2 {
 			precisionInt, _ := strconv.Atoi(matches[2])
-			precision = utils.AsPtr(precisionInt)
+			precision = ptrs.AsPtr(precisionInt)
 			scaleInt, _ := strconv.Atoi(matches[3])
-			scale = utils.AsPtr(scaleInt)
+			scale = ptrs.AsPtr(scaleInt)
 			length = nil
 		}
 	case "year":
 		length = nil
 	case "jsonb":
-		jsonb = utils.AsPtr(true)
+		jsonb = ptrs.AsPtr(true)
 	}
 
 	if tableColumn.Default != nil {
 		re := regexp.MustCompile(`'([^']+)'::`)
 		if matches = re.FindStringSubmatch(*tableColumn.Default); len(matches) == 2 {
-			tableColumn.Default = utils.AsPtr(matches[1])
+			tableColumn.Default = ptrs.AsPtr(matches[1])
 		}
 	}
 
@@ -417,7 +418,7 @@ func (m *PostgreSQLSchemaManager) SelectTableColumns(
 
 	return utils.MapSlice(
 		platforms.Fetch(m.Connection, sql, typedData),
-		utils.AsPtr,
+		ptrs.AsPtr,
 	)
 }
 
@@ -459,7 +460,7 @@ func (m *PostgreSQLSchemaManager) SelectIndexColumns(
 			m.Connection,
 			sql,
 			make([]dtos.SelectIndexColumnsDto, 0),
-		), utils.AsPtr,
+		), ptrs.AsPtr,
 	)
 }
 
@@ -481,7 +482,7 @@ AND table_type = 'BASE TABLE'
 			m.Connection,
 			sql,
 			make([]dtos.SelectTableNamesDto, 0),
-		), utils.AsPtr,
+		), ptrs.AsPtr,
 	)
 }
 
@@ -521,7 +522,7 @@ func (m *PostgreSQLSchemaManager) SelectForeignKeyColumns(
 			m.Connection,
 			sql,
 			make([]dtos.SelectForeignKeyColumnsDto, 0),
-		), utils.AsPtr,
+		), ptrs.AsPtr,
 	)
 }
 
@@ -604,5 +605,5 @@ func (m *PostgreSQLSchemaManager) parseDefaultExpression(defaultExpression *stri
 		return nil
 	}
 
-	return utils.AsPtr(strings.ReplaceAll(*defaultExpression, "''", "'"))
+	return ptrs.AsPtr(strings.ReplaceAll(*defaultExpression, "''", "'"))
 }

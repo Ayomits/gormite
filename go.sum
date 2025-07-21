@@ -2,6 +2,8 @@ github.com/KoNekoD/diff-color v0.0.3 h1:BQ6vq8H1VJNUP/Jq8ic6gx4GAlXLPU3NTjQ7fRTr
 github.com/KoNekoD/diff-color v0.0.3/go.mod h1:/T32dm2UoxCWjbBgZW1qkvav+1M3CCKoZkjyn8ntzvc=
 github.com/KoNekoD/go-snaps v0.0.10 h1:K1VcdV3wdeWtZzKnydGM/7tyI5Wrd2g7qvVAdlNL7QI=
 github.com/KoNekoD/go-snaps v0.0.10/go.mod h1:1QNK19RR9EKcAcAFSfzoAYEZm7Mtbk68g2zNibls+Og=
+github.com/KoNekoD/ptrs v0.0.2 h1:FJOVxaqAL6GKPq1vpzdxiyfKSBeLKC4tTHSBJEz24Hw=
+github.com/KoNekoD/ptrs v0.0.2/go.mod h1:WO6k8HtMhbK/yHjUET+iaFvGUwj34rGzUlcrjFk+AZY=
 github.com/aymanbagabas/go-osc52/v2 v2.0.1 h1:HwpRHbFMcZLEVr42D4p7XBqjyuxQH5SMiErDT4WkJ2k=
 github.com/aymanbagabas/go-osc52/v2 v2.0.1/go.mod h1:uYgXzlJ7ZpABp8OJ+exZzJJhRNQ2ASbcXHWsFqH8hp8=
 github.com/charmbracelet/lipgloss v0.10.0 h1:KWeXFSexGcfahHX+54URiZGkBFazf70JNMtwg/AFW3s=

@@ -9,6 +9,7 @@ import (
 	"github.com/KoNekoD/gormite/pkg/sql_builders"
 	"github.com/KoNekoD/gormite/pkg/types"
 	"github.com/KoNekoD/gormite/pkg/utils"
+	"github.com/KoNekoD/smt/pkg/smt"
 	"github.com/elliotchance/pie/v2"
 	"github.com/gookit/goutil/strutil"
 	"regexp"

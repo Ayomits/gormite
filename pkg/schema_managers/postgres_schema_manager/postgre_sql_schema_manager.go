@@ -7,7 +7,6 @@ import (
 	"github.com/KoNekoD/gormite/pkg/platforms"
 	"github.com/KoNekoD/gormite/pkg/schema_managers/abstract_schema_managers"
 	"github.com/KoNekoD/gormite/pkg/types"
-	"github.com/KoNekoD/gormite/pkg/utils"
 	"github.com/KoNekoD/ptrs/pkg/ptrs"
 	"github.com/KoNekoD/smt/pkg/smt"
 	"regexp"

@@ -35,7 +35,7 @@ func (q *PostgresQuery) Exec(ctx context.Context) error {
 	err := q.ExecWrapped(ctx)
 
 	if err != nil && !errors.Is(err, databaseSql.ErrNoRows) {
-		q.onError("QueryExec", &queryError{err: err, query: q}, trimSQL(q.sql), q.args...)
+		q.onError("QueryExec", &QueryError{err: err, Query: q}, trimSQL(q.sql), q.args...)
 	}
 
 	if err != nil {
@@ -83,13 +83,4 @@ func (q *PostgresQuery) ExecWrapped(ctx context.Context) error {
 	}
 
 	return scanAll(rows, len(columns), positionsList, q.scan)
-}
-
-type queryError struct {
-	err   error
-	query gdh.QueryInterface
-}
-
-func (e *queryError) Error() string {
-	return e.err.Error()
 }

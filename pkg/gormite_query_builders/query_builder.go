@@ -92,7 +92,7 @@ type QueryBuilder[ResultType any] struct {
 	// unionParts - The QueryBuilder for the union parts.
 	unionParts []*dtos.Union
 
-	db         gdh.Database
+	Db         gdh.Database
 	connection *platforms.Connection
 	ctx        context.Context
 }
@@ -130,7 +130,7 @@ func NewQueryBuilderWithContext[T any](
 			db,
 			postgres_platform.NewPostgreSQLPlatform(),
 		),
-		db:  db,
+		Db:  db,
 		ctx: ctx,
 	}
 }
@@ -261,7 +261,7 @@ func (qb *QueryBuilder[ResultType]) GetNamedArgs() any {
 		param := qb.GetParameter(key)
 		args[key] = param
 	}
-	return qb.db.GetNamedArgs(args)
+	return qb.Db.GetNamedArgs(args)
 }
 
 // GetParameterTypes - Gets all defined query parameter types for the query being constructed indexed by parameter index or name.
@@ -1279,7 +1279,7 @@ func (qb *QueryBuilder[ResultType]) Exec() error {
 		return errors.WithStack(err)
 	}
 
-	_, err = qb.db.Exec(qb.ctx, gotSql, qb.GetNamedArgs())
+	_, err = qb.Db.Exec(qb.ctx, gotSql, qb.GetNamedArgs())
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -1293,7 +1293,7 @@ func (qb *QueryBuilder[ResultType]) ExecScan(v any) error {
 		return errors.WithStack(err)
 	}
 
-	err = qb.db.Select(gotSql, qb.GetNamedArgs()).Scan(v).Exec(qb.ctx)
+	err = qb.Db.Select(gotSql, qb.GetNamedArgs()).Scan(v).Exec(qb.ctx)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -1307,7 +1307,7 @@ func (qb *QueryBuilder[ResultType]) ExecScanCol(v any) error {
 		return errors.WithStack(err)
 	}
 
-	err = qb.db.Select(gotSql, qb.GetNamedArgs()).ScanCol(v).Exec(qb.ctx)
+	err = qb.Db.Select(gotSql, qb.GetNamedArgs()).ScanCol(v).Exec(qb.ctx)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -1360,7 +1360,7 @@ func (qb *QueryBuilder[ResultType]) GetOneOrNilLiteralResult() (
 
 	var v ResultType
 
-	err = qb.db.Select(gotSql, args).ScanCol(&v).Exec(qb.ctx)
+	err = qb.Db.Select(gotSql, args).ScanCol(&v).Exec(qb.ctx)
 	if err != nil {
 		return &v, errors.WithStack(err)
 	}
@@ -1376,7 +1376,7 @@ func (qb *QueryBuilder[ResultType]) GetLiteralResult() ([]ResultType, error) {
 
 	var v []ResultType
 
-	rows, err := qb.db.Query(qb.ctx, gotSql, qb.GetNamedArgs())
+	rows, err := qb.Db.Query(qb.ctx, gotSql, qb.GetNamedArgs())
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -1404,7 +1404,7 @@ func (qb *QueryBuilder[ResultType]) ScanOneLiteralResult(target *ResultType) err
 		return errors.WithStack(err)
 	}
 
-	err = qb.db.Select(gotSql, qb.GetNamedArgs()).ScanCol(target).Exec(qb.ctx)
+	err = qb.Db.Select(gotSql, qb.GetNamedArgs()).ScanCol(target).Exec(qb.ctx)
 	if err != nil {
 		return errors.WithStack(err)
 	}

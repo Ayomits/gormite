@@ -17,6 +17,10 @@ type SqlError struct {
 	args []any
 }
 
+func NewSqlError(err error, sql string, args []any) *SqlError {
+	return &SqlError{err: err, sql: sql, args: args}
+}
+
 func (e *SqlError) Error() string {
 	return e.err.Error()
 }

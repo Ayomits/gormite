@@ -10,34 +10,27 @@ import (
 	"github.com/pkg/errors"
 )
 
-type PgXWrapper struct {
+type PgxWrapper struct {
 	*pgxpool.Pool
 	logger *log.Logger
+	onErr  func(method string, err error, sql string, args ...any)
 }
 
-func (w *PgXWrapper) Exec(
-	ctx context.Context,
-	sqlQuery string,
-	args ...any,
-) (pgconn.CommandTag, error) {
-	v, err := w.Pool.Exec(ctx, sqlQuery, args...)
+func (w *PgxWrapper) Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error) {
+	v, err := w.Pool.Exec(ctx, sql, args...)
 
 	if err != nil && !errors.Is(err, databaseSql.ErrNoRows) {
-		w.logger.Warn(err.Error(), "sql", trimSQL(sqlQuery), "args", args)
+		w.onErr("Exec", err, trimSQL(sql), args...)
 	}
 
 	return v, err
 }
 
-func (w *PgXWrapper) Query(
-	ctx context.Context,
-	sqlQuery string,
-	args ...any,
-) (pgx.Rows, error) {
-	v, err := w.Pool.Query(ctx, sqlQuery, args...)
+func (w *PgxWrapper) Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error) {
+	v, err := w.Pool.Query(ctx, sql, args...)
 
 	if err != nil && !errors.Is(err, databaseSql.ErrNoRows) {
-		w.logger.Warn(err.Error(), "sql", trimSQL(sqlQuery), "args", args)
+		w.onErr("Query", err, trimSQL(sql), args...)
 	}
 
 	return v, err

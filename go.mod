@@ -15,6 +15,7 @@ require (
 	github.com/fatih/structtag v1.2.0
 	github.com/google/go-cmp v0.6.0
 	github.com/gookit/goutil v0.6.18
+	github.com/hashicorp/go-multierror v1.1.1
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/pkg/errors v0.9.1
 	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792
@@ -29,6 +30,7 @@ require (
 	github.com/gkampitakis/go-diff v1.3.2 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/gookit/color v1.5.4 // indirect
+	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect

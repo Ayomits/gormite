@@ -37,12 +37,7 @@ type Database interface {
 	GetNamedArgs(args any) any
 }
 
-func SelectExec[T any](
-	ctx context.Context,
-	db Database,
-	sql string,
-	args ...any,
-) (*T, error) {
+func SelectExec[T any](ctx context.Context, db Database, sql string, args ...any) (*T, error) {
 	var v T
 
 	err := db.Select(sql, args...).Scan(&v).Exec(ctx)
@@ -53,12 +48,7 @@ func SelectExec[T any](
 	return &v, nil
 }
 
-func SelectExecSlice[T any](
-	ctx context.Context,
-	db Database,
-	sql string,
-	args ...any,
-) ([]*T, error) {
+func SelectExecSlice[T any](ctx context.Context, db Database, sql string, args ...any) ([]*T, error) {
 	var v []T
 
 	err := db.Select(sql, args...).Scan(&v).Exec(ctx)
@@ -69,12 +59,7 @@ func SelectExecSlice[T any](
 	return smt.MapSlice(v, ptrs.AsPtr), nil
 }
 
-func SelectExecLit[T any](
-	ctx context.Context,
-	db Database,
-	sql string,
-	args ...any,
-) (T, error) {
+func SelectExecLit[T any](ctx context.Context, db Database, sql string, args ...any) (T, error) {
 	var v T
 
 	err := db.Select(sql, args...).ScanCol(&v).Exec(ctx)
@@ -85,12 +70,7 @@ func SelectExecLit[T any](
 	return v, nil
 }
 
-func SelectExecScanLit[T any](
-	ctx context.Context,
-	db Database,
-	sql string,
-	args ...any,
-) (T, error) {
+func SelectExecScanLit[T any](ctx context.Context, db Database, sql string, args ...any) (T, error) {
 	var v T
 
 	err := db.Select(sql, args...).ScanCol(&v).Exec(ctx)
@@ -101,12 +81,7 @@ func SelectExecScanLit[T any](
 	return v, nil
 }
 
-func SelectExecLitSlice[T any](
-	ctx context.Context,
-	db Database,
-	sql string,
-	args ...any,
-) ([]T, error) {
+func SelectExecLitSlice[T any](ctx context.Context, db Database, sql string, args ...any) ([]T, error) {
 	var v []T
 
 	rows, err := db.Query(ctx, sql, args...)
@@ -127,12 +102,7 @@ func SelectExecLitSlice[T any](
 	return v, nil
 }
 
-func Exec(
-	ctx context.Context,
-	db Database,
-	sql string,
-	args ...any,
-) error {
+func Exec(ctx context.Context, db Database, sql string, args ...any) error {
 	_, err := db.Exec(ctx, sql, args...)
 
 	return errors.WithStack(err)

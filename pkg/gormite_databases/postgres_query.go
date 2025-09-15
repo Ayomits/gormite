@@ -35,7 +35,7 @@ func (q *PostgresQuery) Exec(ctx context.Context) error {
 	err := q.ExecWrapped(ctx)
 
 	if err != nil && !errors.Is(err, databaseSql.ErrNoRows) {
-		q.onError("QueryExec", &QueryError{err: err, Query: q}, trimSQL(q.sql), q.args...)
+		q.onError("QueryExec", &QueryError{err: err, query: q}, trimSQL(q.sql), q.args...)
 	}
 
 	if err != nil {

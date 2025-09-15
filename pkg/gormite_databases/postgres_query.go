@@ -4,13 +4,12 @@ import (
 	"context"
 	databaseSql "database/sql"
 	gdh "github.com/KoNekoD/gormite/pkg/gormite_databases_helpers"
-	"github.com/charmbracelet/log"
 	"github.com/pkg/errors"
 )
 
-type Query struct {
-	db     PgxWrappedDatabase
-	logger *log.Logger
+type PostgresQuery struct {
+	db      PgXWrappedDatabase
+	onError func(method string, err error, sql string, args ...any)
 
 	sql       string
 	args      []any
@@ -19,26 +18,24 @@ type Query struct {
 	scanCol   bool
 }
 
-func (q *Query) Scan(dest ...any) gdh.QueryInterface {
+func (q *PostgresQuery) Scan(dest ...any) gdh.QueryInterface {
 	q.scan = append(q.scan, dest...)
 
 	return q
 }
 
-func (q *Query) ScanCol(dest ...any) gdh.QueryInterface {
+func (q *PostgresQuery) ScanCol(dest ...any) gdh.QueryInterface {
 	q.scan = append(q.scan, dest...)
 	q.scanCol = true
 
 	return q
 }
 
-func (q *Query) Exec(ctx context.Context) error {
+func (q *PostgresQuery) Exec(ctx context.Context) error {
 	err := q.ExecWrapped(ctx)
 
 	if err != nil && !errors.Is(err, databaseSql.ErrNoRows) {
-		err = &queryError{err: err, query: q}
-
-		q.logger.Warn(err.Error(), "sql", trimSQL(q.sql), "args", q.args)
+		q.onError("QueryExec", &queryError{err: err, query: q}, trimSQL(q.sql), q.args...)
 	}
 
 	if err != nil {
@@ -48,7 +45,7 @@ func (q *Query) Exec(ctx context.Context) error {
 	return nil
 }
 
-func (q *Query) ExecWrapped(ctx context.Context) error {
+func (q *PostgresQuery) ExecWrapped(ctx context.Context) error {
 	rows, err := q.db.Query(ctx, q.sql, q.args...)
 	if err != nil {
 		return errors.WithStack(err)
@@ -86,4 +83,13 @@ func (q *Query) ExecWrapped(ctx context.Context) error {
 	}
 
 	return scanAll(rows, len(columns), positionsList, q.scan)
+}
+
+type queryError struct {
+	err   error
+	query gdh.QueryInterface
+}
+
+func (e *queryError) Error() string {
+	return e.err.Error()
 }

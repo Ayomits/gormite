@@ -2,8 +2,8 @@ package gormite_databases
 
 import (
 	"context"
+	databaseSql "database/sql"
 	gdh "github.com/KoNekoD/gormite/pkg/gormite_databases_helpers"
-	"github.com/KoNekoD/gormite/pkg/utils"
 	"github.com/KoNekoD/pgx-colon-query-rewriter/pkg/pgxcqr"
 	"github.com/charmbracelet/log"
 	"github.com/hashicorp/go-multierror"
@@ -13,37 +13,29 @@ import (
 	"github.com/pkg/errors"
 )
 
-type newPostgresDatabaseOption struct {
-	onError func(method string, err error, sql string, args ...any)
+type PostgresOptionFn func(o *PostgresDatabase)
+
+func PostgresWithOnError(onError func(method string, err error, sql string, args ...any)) PostgresOptionFn {
+	return func(o *PostgresDatabase) { o.onError = onError }
 }
 
-type NewPostgresDatabaseOptionFn func(o *newPostgresDatabaseOption)
-
-func WithOnError(onError func(method string, err error, sql string, args ...any)) NewPostgresDatabaseOptionFn {
-	return func(o *newPostgresDatabaseOption) {
-		o.onError = onError
-	}
-}
-
-type PgxWrappedDatabase interface {
+type PgXWrappedDatabase interface {
 	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
 	Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error)
 }
 
 type PostgresDatabase struct {
-	PgX       PgxWrappedDatabase
+	PgX       PgXWrappedDatabase
 	PgxConfig *pgxpool.Config
 
-	pgxConn *PgxWrapper
-	logger  *log.Logger
+	pgxConn *pgxpool.Pool
+	onError func(method string, err error, sql string, args ...any)
 }
 
-func NewPostgresDatabase(ctx context.Context, dsn string, opts ...NewPostgresDatabaseOptionFn) *PostgresDatabase {
-	logger := utils.NewLogger("storage")
-
+func NewPostgresDatabase(ctx context.Context, dsn string, opts ...PostgresOptionFn) *PostgresDatabase {
 	config, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
-		logger.Fatal("Cannot parse config", "err", err)
+		log.Fatalf("Cannot parse config: %v\n", err)
 	}
 
 	pgxPool, err := pgxpool.NewWithConfig(ctx, config)
@@ -51,26 +43,34 @@ func NewPostgresDatabase(ctx context.Context, dsn string, opts ...NewPostgresDat
 		log.Fatalf("Unable to connect to database: %v\n", err)
 	}
 
-	conn := &PgxWrapper{Pool: pgxPool, logger: logger}
-
 	onError := func(method string, err error, sql string, args ...any) {
-		logger.Warn(err.Error(), "sql", sql, "args", args)
+		log.Warn(err.Error(), "sql", sql, "args", args)
 	}
 
-	o := &newPostgresDatabaseOption{onError: onError}
+	v := &PostgresDatabase{PgX: pgxPool, PgxConfig: config, pgxConn: pgxPool, onError: onError}
+
 	for _, opt := range opts {
-		opt(o)
+		opt(v)
 	}
 
-	conn.onErr = o.onError
-
-	return &PostgresDatabase{PgX: conn, PgxConfig: config, pgxConn: conn, logger: logger}
+	return v
 }
 
 func (d *PostgresDatabase) WrapInTransaction(ctx context.Context, fn func(ctx context.Context) error) error {
 	opts := pgx.TxOptions{IsoLevel: pgx.ReadCommitted}
 
-	tx, err := d.PgX.(*PgxWrapper).BeginTx(ctx, opts)
+	var (
+		tx  pgx.Tx
+		err error
+	)
+
+	switch p := d.PgX.(type) {
+	case *pgxpool.Pool:
+		tx, err = p.BeginTx(ctx, opts)
+	case pgx.Tx:
+		tx, err = p.Begin(ctx)
+	}
+
 	if err != nil {
 		return errors.Wrap(err, "failed to begin transaction")
 	}
@@ -95,27 +95,29 @@ func (d *PostgresDatabase) WrapInTransaction(ctx context.Context, fn func(ctx co
 }
 
 func (d *PostgresDatabase) Select(sql string, args ...any) gdh.QueryInterface {
-	return &Query{db: d.PgX, sql: sql, args: args, logger: d.logger}
+	return &PostgresQuery{db: d.PgX, sql: sql, args: args, onError: d.onError}
 }
 
 func (d *PostgresDatabase) Get(sql string, args ...any) gdh.QueryInterface {
-	return &Query{
-		db:        d.PgX,
-		sql:       sql,
-		args:      args,
-		scanFirst: true,
-		logger:    d.logger,
-	}
+	return &PostgresQuery{db: d.PgX, sql: sql, args: args, scanFirst: true, onError: d.onError}
 }
 
 func (d *PostgresDatabase) Exec(ctx context.Context, sql string, args ...any) (gdh.CommandTag, error) {
 	tag, err := d.PgX.Exec(ctx, sql, args...)
+
+	if err != nil && !errors.Is(err, databaseSql.ErrNoRows) {
+		d.onError("Exec", err, trimSQL(sql), args...)
+	}
 
 	return tag, errors.WithStack(err)
 }
 
 func (d *PostgresDatabase) Query(ctx context.Context, sql string, args ...any) (gdh.Rows, error) {
 	rows, err := d.PgX.Query(ctx, sql, args...)
+
+	if err != nil && !errors.Is(err, databaseSql.ErrNoRows) {
+		d.onError("Query", err, trimSQL(sql), args...)
+	}
 
 	return rows, errors.WithStack(err)
 }

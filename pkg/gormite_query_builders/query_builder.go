@@ -1273,13 +1273,6 @@ func (qb *QueryBuilder[ResultType]) GetRootAliases() []string {
 	return aliases
 }
 
-// Exec
-
-// SelectExec
-// SelectExecSlice
-// SelectExecLit
-// SelectExecLitSlice
-
 func (qb *QueryBuilder[ResultType]) Exec() error {
 	gotSql, err := qb.GetSQL()
 	if err != nil {

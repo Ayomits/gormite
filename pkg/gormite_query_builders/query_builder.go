@@ -8,12 +8,11 @@ import (
 	"github.com/KoNekoD/gormite/pkg/enums"
 	"github.com/KoNekoD/gormite/pkg/expression_builders"
 	"github.com/KoNekoD/gormite/pkg/g_err"
-	"github.com/KoNekoD/gormite/pkg/gormite_databases"
+	gdh "github.com/KoNekoD/gormite/pkg/gormite_databases_helpers"
 	"github.com/KoNekoD/gormite/pkg/platforms"
 	"github.com/KoNekoD/gormite/pkg/platforms/postgres_platform"
 	"github.com/KoNekoD/ptrs/pkg/ptrs"
 	"github.com/KoNekoD/smt/pkg/smt"
-	"github.com/jackc/pgx/v5"
 	"github.com/pkg/errors"
 	"golang.org/x/exp/maps"
 	"slices"
@@ -34,10 +33,9 @@ type QueryBuilder[ResultType any] struct {
 	sql *string
 
 	// params - The query parameters.
-	params map[string]interface{}
+	params map[string]any
 
 	// types - The parameter type map of this query.
-	// TODO: WrapperParameterTypeArray
 	types map[string]string
 
 	// queryType - The type of query this is. Can be select, update or delete.
@@ -53,77 +51,63 @@ type QueryBuilder[ResultType any] struct {
 	boundCounter int
 
 	// selectParts - The SELECT parts of the query.
-	// []
 	selectParts []string
 
 	// returningParts - The RETURNING parts of the query.
-	// []
 	returningParts []string
 
 	// distinct - Whether this is a SELECT DISTINCT query.
-	// false
 	distinct bool
 
 	// fromParts - The FROM parts of a SELECT query.
-	// []
 	fromParts []*dtos.From
 
 	// table - The table name for an INSERT, UPDATE or DELETE query.
-	// null
 	table *string
 
 	// join - The list of joins, indexed by from alias.
-	// []
 	join map[string][]*dtos.Join
 
 	// set - The SET parts of an UPDATE query.
-	// []
 	set []string
 
 	// where - The WHERE part of a SELECT, UPDATE or DELETE query.
-	// null
 	where *dtos.CompositeExpressionOrString
 
 	// groupBy - The GROUP BY part of a SELECT query.
-	// []
 	groupBy []string
 
 	// having - The HAVING part of a SELECT query.
-	// null
 	having *dtos.CompositeExpressionOrString
 
 	// orderBy - The ORDER BY parts of a SELECT query.
-	// []
 	orderBy []string
 
 	// forUpdate - The FOR UPDATE part of a SELECT query.
-	// null
 	forUpdate *dtos.ForUpdate
 
 	// values - The values of an INSERT query.
-	// []
 	values map[string]string
 
 	// unionParts - The QueryBuilder for the union parts.
-	// []
 	unionParts []*dtos.Union
 
-	// connection - Initializes a new <tt>QueryBuilder</tt>.
-	//@param Connection connection The DBAL Connection.
+	db         gdh.Database
 	connection *platforms.Connection
-	D          gormite_databases.PostgresDatabaseInterface
 	ctx        context.Context
 }
 
-// NewQueryBuilder - Initializes a new <tt>QueryBuilder</tt>.
-func NewQueryBuilder[ResultType any](d gormite_databases.PostgresDatabaseInterface) *QueryBuilder[ResultType] {
-	return NewQueryBuilderWithContext[ResultType](context.Background(), d)
+func NewQueryBuilder[T any](db gdh.Database) *QueryBuilder[T] {
+	return NewQueryBuilderWithContext[T](context.Background(), db)
 }
 
-func NewQueryBuilderWithContext[ResultType any](ctx context.Context, d gormite_databases.PostgresDatabaseInterface) *QueryBuilder[ResultType] {
-	return &QueryBuilder[ResultType]{
+func NewQueryBuilderWithContext[T any](
+	ctx context.Context,
+	db gdh.Database,
+) *QueryBuilder[T] {
+	return &QueryBuilder[T]{
 		sql:          nil,
-		params:       make(map[string]interface{}),
+		params:       make(map[string]any),
 		types:        make(map[string]string),
 		queryType:    enums.QueryTypeSelect,
 		firstResult:  0,
@@ -143,24 +127,20 @@ func NewQueryBuilderWithContext[ResultType any](ctx context.Context, d gormite_d
 		values:       make(map[string]string),
 		unionParts:   nil,
 		connection: platforms.NewConnection(
-			d,
+			db,
 			postgres_platform.NewPostgreSQLPlatform(),
 		),
-		D:   d,
+		db:  db,
 		ctx: ctx,
 	}
 }
 
 // Expr - Gets an ExpressionBuilder used for object-oriented construction of query expressions.
-// This producer method is intended for convenient inline usage. Example:
-// <code>
+// This producer method is intended for convenient inline usage
 //
-//	qb = conn.createQueryBuilder()
-//	    .select('u')
-//	    .from('users', 'u')
-//	    .where(qb.expr().eq('u.id', 1));
+//		qb := NewQueryBuilder(db).Select("u.id").From("users", "u")
+//	 qb.Where(qb.Expr().Eq("u.id", "1"));
 //
-// </code>
 // For more complex expression construction, consider storing the expression
 // builder object in a local variable.
 func (qb *QueryBuilder[ResultType]) Expr() *expression_builders.ExpressionBuilder {
@@ -214,7 +194,7 @@ func (qb *QueryBuilder[ResultType]) MustGetSQL() string {
 //	qb = conn.createQueryBuilder().select('u').from('users', 'u').where('u.id = :user_id').setParameter('user_id', 1);
 func (qb *QueryBuilder[ResultType]) SetParameter(
 	key string,
-	value interface{},
+	value any,
 	paramType ...enums.ParameterType,
 ) *QueryBuilder[ResultType] {
 	qb.params[key] = value
@@ -243,7 +223,7 @@ func (qb *QueryBuilder[ResultType]) SetParameter(
 //
 // </code>
 func (qb *QueryBuilder[ResultType]) SetParameters(
-	params map[string]interface{},
+	params map[string]any,
 	types ...map[string]string,
 ) *QueryBuilder[ResultType] {
 	qb.params = params
@@ -267,7 +247,7 @@ func (qb *QueryBuilder[ResultType]) SetParameters(
 // GetParameter - Gets a (previously set) query parameter of the query being constructed.
 // @param string|int key The key (index or name) of the bound parameter.
 // @return mixed The value of the bound parameter.
-func (qb *QueryBuilder[ResultType]) GetParameter(key string) interface{} {
+func (qb *QueryBuilder[ResultType]) GetParameter(key string) any {
 	if value, ok := qb.params[key]; ok {
 		return value
 	}
@@ -275,17 +255,16 @@ func (qb *QueryBuilder[ResultType]) GetParameter(key string) interface{} {
 }
 
 // GetNamedArgs - Gets all defined query parameters of the query being constructed indexed by parameter name.
-func (qb *QueryBuilder[ResultType]) GetNamedArgs() pgx.StrictNamedArgs {
-	args := pgx.StrictNamedArgs{}
+func (qb *QueryBuilder[ResultType]) GetNamedArgs() any {
+	args := map[string]any{}
 	for _, key := range maps.Keys(qb.GetParameterTypes()) {
 		param := qb.GetParameter(key)
 		args[key] = param
 	}
-	return args
+	return qb.db.GetNamedArgs(args)
 }
 
 // GetParameterTypes - Gets all defined query parameter types for the query being constructed indexed by parameter index or name.
-// @psalm-return WrapperParameterTypeArray
 func (qb *QueryBuilder[ResultType]) GetParameterTypes() map[string]string {
 	return qb.types
 }
@@ -1129,7 +1108,7 @@ func (qb *QueryBuilder[ResultType]) ToString() string {
 // @param string|null placeHolder The name to bind with. The string must start with a colon ':'.
 // @return string the placeholder name used.
 func (qb *QueryBuilder[ResultType]) CreateNamedParameter(
-	value interface{},
+	value any,
 	paramType enums.ParameterType,
 	placeHolder *string,
 ) string {
@@ -1151,7 +1130,7 @@ func (qb *QueryBuilder[ResultType]) CreateNamedParameter(
 // qb = conn.createQueryBuilder();
 // qb.select('u.*').from('users', 'u').where('u.username = ' . qb.createPositionalParameter('Foo', ParameterType::STRING)).orWhere('u.username = ' . qb.createPositionalParameter('Bar', ParameterType::STRING))
 func (qb *QueryBuilder[ResultType]) CreatePositionalParameter(
-	value interface{},
+	value any,
 	paramType ...enums.ParameterType,
 ) string {
 	qb.SetParameter(fmt.Sprintf("%d", qb.boundCounter), value, paramType...)
@@ -1226,70 +1205,11 @@ func (qb *QueryBuilder[ResultType]) Clone() *QueryBuilder[ResultType] {
 	if qb.having != nil {
 		cloned.having = qb.having.Clone()
 	}
-	cloned.params = make(map[string]interface{})
+	cloned.params = make(map[string]any)
 	for key, param := range qb.params {
 		cloned.params[key] = param
 	}
 	return &cloned
-}
-
-func CloneTo[New any, Old any](oldQb *QueryBuilder[Old]) *QueryBuilder[New] {
-	newQb := QueryBuilder[New](*oldQb)
-
-	return newQb.Clone()
-}
-
-func (qb *QueryBuilder[ResultType]) Exec() error {
-	gotSql, err := qb.GetSQL()
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	_, err = qb.D.Exec(qb.ctx, gotSql, qb.GetNamedArgs())
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	return nil
-}
-
-func (qb *QueryBuilder[ResultType]) ExecScan(v interface{}) error {
-	gotSql, err := qb.GetSQL()
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	err = qb.D.Select(gotSql, qb.GetNamedArgs()).Scan(v).Exec(qb.ctx)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	return nil
-}
-
-func ExecOrErr[ResultType any](
-	qb *QueryBuilder[ResultType],
-	v ResultType,
-) (*ResultType, error) {
-	if err := qb.ExecScan(&v); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return &v, nil
-}
-
-func (qb *QueryBuilder[ResultType]) ExecScanCol(v interface{}) error {
-	gotSql, err := qb.GetSQL()
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	err = qb.D.Select(gotSql, qb.GetNamedArgs()).ScanCol(v).Exec(qb.ctx)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	return nil
 }
 
 // PrepareIN - Creates a string of named parameters for the IN clause of the query.
@@ -1307,37 +1227,34 @@ func (qb *QueryBuilder[ResultType]) PrepareIN(args []string) string {
 	return strings.Join(namedArgs, ", ")
 }
 
-func (qb *QueryBuilder[ResultType]) PrepareInArgs(argsAny any) []string {
-	switch args := argsAny.(type) {
-	case []string:
-		namedArgs := make([]string, 0, len(args))
-		for i := range args {
-			namedArgs = append(
-				namedArgs,
-				qb.CreateNamedParameter(
-					args[i],
-					enums.ParameterTypeString,
-					nil,
-				),
-			)
-		}
-		return namedArgs
-	case []int:
-		namedArgs := make([]string, 0, len(args))
-		for i := range args {
-			namedArgs = append(
-				namedArgs,
-				qb.CreateNamedParameter(
-					args[i],
-					enums.ParameterTypeString,
-					nil,
-				),
-			)
-		}
-		return namedArgs
-	default:
-		return nil
+func (qb *QueryBuilder[ResultType]) PrepareInArgsInt(args []int) []string {
+	namedArgs := make([]string, 0, len(args))
+	for i := range args {
+		namedArgs = append(
+			namedArgs,
+			qb.CreateNamedParameter(
+				args[i],
+				enums.ParameterTypeString,
+				nil,
+			),
+		)
 	}
+	return namedArgs
+}
+
+func (qb *QueryBuilder[ResultType]) PrepareInArgsStr(args []string) []string {
+	namedArgs := make([]string, 0, len(args))
+	for i := range args {
+		namedArgs = append(
+			namedArgs,
+			qb.CreateNamedParameter(
+				args[i],
+				enums.ParameterTypeString,
+				nil,
+			),
+		)
+	}
+	return namedArgs
 }
 
 func (qb *QueryBuilder[ResultType]) GetRootAliases() []string {
@@ -1354,6 +1271,55 @@ func (qb *QueryBuilder[ResultType]) GetRootAliases() []string {
 	}
 
 	return aliases
+}
+
+// Exec
+
+// SelectExec
+// SelectExecSlice
+// SelectExecLit
+// SelectExecLitSlice
+
+func (qb *QueryBuilder[ResultType]) Exec() error {
+	gotSql, err := qb.GetSQL()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	_, err = qb.db.Exec(qb.ctx, gotSql, qb.GetNamedArgs())
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	return nil
+}
+
+func (qb *QueryBuilder[ResultType]) ExecScan(v any) error {
+	gotSql, err := qb.GetSQL()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	err = qb.db.Select(gotSql, qb.GetNamedArgs()).Scan(v).Exec(qb.ctx)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	return nil
+}
+
+func (qb *QueryBuilder[ResultType]) ExecScanCol(v any) error {
+	gotSql, err := qb.GetSQL()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	err = qb.db.Select(gotSql, qb.GetNamedArgs()).ScanCol(v).Exec(qb.ctx)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	return nil
 }
 
 func (qb *QueryBuilder[ResultType]) GetResult() ([]*ResultType, error) {
@@ -1385,52 +1351,70 @@ func (qb *QueryBuilder[ResultType]) GetOneOrNilResult() (*ResultType, error) {
 		return nil, errors.Errorf("expected 1 result, got %d", len(v))
 	}
 
-	return ptrs.AsPtr(v[0]), nil
+	return &v[0], nil
 }
 
 func (qb *QueryBuilder[ResultType]) GetOneOrNilLiteralResult() (
 	*ResultType,
 	error,
 ) {
-	var v ResultType
-
-	err := qb.ExecScanCol(&v)
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil
-	}
+	gotSql, err := qb.GetSQL()
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	return ptrs.AsPtr(v), nil
+	args := qb.GetNamedArgs()
+
+	var v ResultType
+
+	err = qb.db.Select(gotSql, args).ScanCol(&v).Exec(qb.ctx)
+	if err != nil {
+		return &v, errors.WithStack(err)
+	}
+
+	return &v, nil
 }
 
 func (qb *QueryBuilder[ResultType]) GetLiteralResult() ([]ResultType, error) {
-	var v []ResultType
-
-	err := qb.ExecScanCol(&v)
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil
-	}
+	gotSql, err := qb.GetSQL()
 	if err != nil {
 		return nil, errors.WithStack(err)
+	}
+
+	var v []ResultType
+
+	rows, err := qb.db.Query(qb.ctx, gotSql, qb.GetNamedArgs())
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	for rows.Next() {
+		var rowValue ResultType
+
+		if err := rows.Scan(&rowValue); err != nil {
+			return nil, errors.WithStack(err)
+		}
+
+		v = append(v, rowValue)
 	}
 
 	return v, nil
 }
 
 func (qb *QueryBuilder[ResultType]) ScanOneLiteralResult(target *ResultType) error {
-	var v ResultType
-
-	if err := qb.ExecScanCol(&v); err != nil {
-		return errors.WithStack(err)
-	}
-
 	if target == nil {
 		return errors.New("target is nil")
 	}
 
-	*target = v
+	gotSql, err := qb.GetSQL()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	err = qb.db.Select(gotSql, qb.GetNamedArgs()).ScanCol(target).Exec(qb.ctx)
+	if err != nil {
+		return errors.WithStack(err)
+	}
 
 	return nil
 }

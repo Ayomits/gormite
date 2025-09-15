@@ -5,6 +5,7 @@ import (
 	"github.com/KoNekoD/go-snaps/snaps"
 	"github.com/KoNekoD/gormite/pkg/diff_calc"
 	"github.com/KoNekoD/gormite/pkg/gormite_databases"
+	gdh "github.com/KoNekoD/gormite/pkg/gormite_databases_helpers"
 	"github.com/KoNekoD/gormite/pkg/local_schema"
 	"github.com/KoNekoD/gormite/pkg/platforms"
 	"github.com/KoNekoD/gormite/pkg/platforms/postgres_platform"
@@ -17,28 +18,35 @@ import (
 
 type mockQuery struct{}
 
-func (m mockQuery) Scan(dest ...interface{}) gormite_databases.QueryInterface { return m }
+func (m mockQuery) Scan(dest ...interface{}) gdh.QueryInterface { return m }
 
-func (m mockQuery) ScanCol(dest ...interface{}) gormite_databases.QueryInterface { return m }
+func (m mockQuery) ScanCol(dest ...interface{}) gdh.QueryInterface { return m }
 
 func (m mockQuery) Exec(ctx context.Context) error { return nil }
 
 type mockPostgresDatabase struct{}
 
-func (m mockPostgresDatabase) Exec(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error) {
+func (m mockPostgresDatabase) Exec(ctx context.Context, sql string, arguments ...any) (gdh.CommandTag, error) {
 	return pgconn.CommandTag{}, nil
 }
 
-func (m mockPostgresDatabase) Select(sql string, args ...interface{}) gormite_databases.QueryInterface {
+func (m mockPostgresDatabase) Select(sql string, args ...interface{}) gdh.QueryInterface {
 	return &mockQuery{}
 }
 
-func (m mockPostgresDatabase) Get(sql string, args ...interface{}) gormite_databases.QueryInterface {
+func (m mockPostgresDatabase) Get(sql string, args ...interface{}) gdh.QueryInterface {
 	return &mockQuery{}
+}
+
+func (m mockPostgresDatabase) Query(ctx context.Context, sql string, args ...any) (gdh.Rows, error) {
+	panic("not implemented")
+}
+func (m mockPostgresDatabase) GetNamedArgs(args any) any {
+	panic("not implemented")
 }
 
 func TestDiffRunnerTest(t *testing.T) {
-	d := &mockPostgresDatabase{}
+	d := gormite_databases.PostgresDatabase{}
 
 	p := postgres_platform.NewPostgreSQLPlatform()
 

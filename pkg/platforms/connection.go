@@ -2,29 +2,24 @@ package platforms
 
 import (
 	"context"
-	"database/sql"
-	"github.com/KoNekoD/gormite/pkg/gormite_databases"
+	databaseSql "database/sql"
+	gdh "github.com/KoNekoD/gormite/pkg/gormite_databases_helpers"
 	"github.com/charmbracelet/log"
 	"github.com/pkg/errors"
 )
 
 type Connection struct {
-	Platform AbstractPlatformInterface
-	pg       gormite_databases.PostgresDatabaseInterface
+	db       gdh.Database
+	platform AbstractPlatformInterface
 }
 
-func NewConnection(db any, platform AbstractPlatformInterface) *Connection {
-	switch v := db.(type) {
-	case gormite_databases.PostgresDatabaseInterface:
-		return &Connection{Platform: platform, pg: v}
-	}
-
-	panic("unknown type")
+func NewConnection(db gdh.Database, p AbstractPlatformInterface) *Connection {
+	return &Connection{db: db, platform: p}
 }
 
-func Fetch[T any](c *Connection, sqlString string, typedData T) T {
-	err := c.pg.Select(sqlString).Scan(&typedData).Exec(context.Background())
-	if err != nil && !errors.Is(err, sql.ErrNoRows) { // TODO: ПОПРАВИТЬ!!!
+func Fetch[T any](c *Connection, sql string, typedData T) T {
+	err := c.db.Select(sql).Scan(&typedData).Exec(context.Background())
+	if err != nil && !errors.Is(err, databaseSql.ErrNoRows) {
 		log.Warn("error when fetching", "err", err)
 	}
 
@@ -32,13 +27,13 @@ func Fetch[T any](c *Connection, sqlString string, typedData T) T {
 }
 
 func (c *Connection) GetDatabasePlatform() AbstractPlatformInterface {
-	return c.Platform
+	return c.platform
 }
 
-func (c *Connection) FetchAllAssociative(sql string) []map[string]interface{} {
-	result := make([]map[string]interface{}, 0)
+func (c *Connection) FetchAllAssociative(sql string) []map[string]any {
+	result := make([]map[string]any, 0)
 
-	err := c.pg.Get(sql).ScanCol(&result).Exec(context.Background())
+	err := c.db.Get(sql).ScanCol(&result).Exec(context.Background())
 	if err != nil {
 		log.Warn("error when fetching", "err", err)
 	}
@@ -49,9 +44,12 @@ func (c *Connection) FetchAllAssociative(sql string) []map[string]interface{} {
 func (c *Connection) GetDatabase() string {
 	database := ""
 
-	selectSQL := c.Platform.GetDummySelectSQL(c.Platform.GetCurrentDatabaseExpression())
+	sql := c.platform.GetDummySelectSQL(c.platform.GetCurrentDatabaseExpression())
 
-	_ = c.pg.Get(selectSQL).ScanCol(&database).Exec(context.Background())
+	err := c.db.Get(sql).ScanCol(&database).Exec(context.Background())
+	if err != nil {
+		panic(err)
+	}
 
 	return database
 }

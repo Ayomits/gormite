@@ -6,6 +6,7 @@ toolchain go1.24.4
 
 require (
 	github.com/KoNekoD/go-snaps v0.0.10
+	github.com/KoNekoD/pgx-colon-query-rewriter v0.0.3
 	github.com/KoNekoD/ptrs v0.0.2
 	github.com/KoNekoD/smt v0.0.2
 	github.com/charmbracelet/log v0.4.0
@@ -14,7 +15,7 @@ require (
 	github.com/fatih/structtag v1.2.0
 	github.com/google/go-cmp v0.6.0
 	github.com/gookit/goutil v0.6.18
-	github.com/jackc/pgx/v5 v5.7.1
+	github.com/jackc/pgx/v5 v5.7.5
 	github.com/pkg/errors v0.9.1
 	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792
 	gopkg.in/yaml.v3 v3.0.1
@@ -39,15 +40,15 @@ require (
 	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/muesli/termenv v0.15.2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	github.com/rogpeppe/go-internal v1.13.1 // indirect
+	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/tidwall/gjson v1.17.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
-	golang.org/x/crypto v0.27.0 // indirect
+	golang.org/x/crypto v0.37.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
-	golang.org/x/term v0.27.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/term v0.31.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
 )

@@ -13,7 +13,7 @@ Gormite looks for default settings in the resources directory.
 
 **resources/gormite.yaml**
 
-```
+```yaml
 gormite:  
   orm:    
     mapping:      
@@ -28,7 +28,7 @@ Inside pkg/entities, create files with structures describing the database tables
 
 **user.go**
 
-```
+```go
 package entities
 
 import “github.com/KoNekoD/gormite/test/docs_example/pkg/enums”.

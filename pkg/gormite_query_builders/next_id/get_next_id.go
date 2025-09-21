@@ -2,15 +2,16 @@ package next_id
 
 import (
 	"fmt"
-	"iter"
-
 	gqb "github.com/KoNekoD/gormite/pkg/gormite_query_builders"
+	"github.com/pkg/errors"
+	"iter"
 )
 
 type option struct {
 	alias     string
 	startFrom any
 	limit     int
+	onError   func(error)
 }
 
 type OptionFn func(*option)
@@ -27,19 +28,27 @@ func WithLimit(limit int) OptionFn {
 	return func(o *option) { o.limit = limit }
 }
 
-func getOptions(opts []OptionFn) (alias string, startFrom any, limit int) {
-	options := &option{alias: "e", limit: 1000}
+func WithOnError(onError func(error)) OptionFn {
+	return func(o *option) { o.onError = onError }
+}
+
+func defaultOnError(err error) {
+	fmt.Println(errors.Wrap(err, "failed to get next id"))
+}
+
+func getOptions(opts []OptionFn) (alias string, startFrom any, limit int, onError func(error)) {
+	options := &option{alias: "e", limit: 1000, onError: defaultOnError}
 
 	for _, opt := range opts {
 		opt(options)
 	}
 
-	return options.alias, options.startFrom, options.limit
+	return options.alias, options.startFrom, options.limit, options.onError
 }
 
 // GetNextId - Helper function to get next id from the query builder through iteration.
 func GetNextId[T int | string](qb *gqb.QueryBuilder[T], opts ...OptionFn) iter.Seq[T] {
-	alias, startFrom, limit := getOptions(opts)
+	alias, startFrom, limit, onError := getOptions(opts)
 
 	column := fmt.Sprintf("%s.id", alias)
 
@@ -53,10 +62,8 @@ func GetNextId[T int | string](qb *gqb.QueryBuilder[T], opts ...OptionFn) iter.S
 
 			ids, err := doQb.GetLiteralResult()
 			if err != nil {
-				panic(err)
+				onError(err)
 			}
-
-			fmt.Printf("got %d ids\n", len(ids))
 
 			if len(ids) == 0 {
 				break

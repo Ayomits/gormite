@@ -10,10 +10,7 @@ func NewDecimalType() *DecimalType {
 	return &DecimalType{AbstractType: &AbstractType{}}
 }
 
-func (d *DecimalType) GetSQLDeclaration(
-	column map[string]interface{},
-	platform TypesPlatform,
-) string {
+func (d *DecimalType) GetSQLDeclaration(column map[string]any, platform TypesPlatform) string {
 	return platform.GetDecimalTypeDeclarationSQL(column)
 }
 

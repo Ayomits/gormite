@@ -6,6 +6,6 @@ func NewStringType() *StringType {
 	return &StringType{AbstractType: &AbstractType{}}
 }
 
-func (s *StringType) GetSQLDeclaration(column map[string]interface{}, platform TypesPlatform) string {
+func (s *StringType) GetSQLDeclaration(column map[string]any, platform TypesPlatform) string {
 	return platform.GetStringTypeDeclarationSQL(column)
 }

@@ -4,14 +4,14 @@ package dtos
 type SchemaConfig struct {
 	maxIdentifierLength int
 	name                *string
-	defaultTableOptions map[string]interface{}
+	defaultTableOptions map[string]any
 }
 
 func NewSchemaConfig() *SchemaConfig {
 	return &SchemaConfig{
 		maxIdentifierLength: 63,
 		name:                nil,
-		defaultTableOptions: make(map[string]interface{}),
+		defaultTableOptions: make(map[string]any),
 	}
 }
 
@@ -35,10 +35,10 @@ func (s *SchemaConfig) SetName(name *string) {
 
 // GetDefaultTableOptions - Gets the default options that are passed to Table instances created with
 // Schema#createTable().
-func (s *SchemaConfig) GetDefaultTableOptions() map[string]interface{} {
+func (s *SchemaConfig) GetDefaultTableOptions() map[string]any {
 	return s.defaultTableOptions
 }
 
-func (s *SchemaConfig) SetDefaultTableOptions(defaultTableOptions map[string]interface{}) {
+func (s *SchemaConfig) SetDefaultTableOptions(defaultTableOptions map[string]any) {
 	s.defaultTableOptions = defaultTableOptions
 }

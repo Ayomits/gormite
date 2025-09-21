@@ -44,7 +44,7 @@ func (parent *AbstractPlatform) InitializeAllDoctrineTypeMappings() {
 	}
 }
 
-func (parent *AbstractPlatform) ExtractLength(data map[string]interface{}) *int {
+func (parent *AbstractPlatform) ExtractLength(data map[string]any) *int {
 	if lengthAny, ok := data[`length`]; ok {
 		switch lengthValue := lengthAny.(type) {
 		case int:
@@ -59,7 +59,7 @@ func (parent *AbstractPlatform) ExtractLength(data map[string]interface{}) *int 
 	return nil
 }
 
-func (parent *AbstractPlatform) GetStringTypeDeclarationSQL(column map[string]interface{}) string {
+func (parent *AbstractPlatform) GetStringTypeDeclarationSQL(column map[string]any) string {
 	a := parent.child
 	length := a.ExtractLength(column)
 
@@ -69,7 +69,7 @@ func (parent *AbstractPlatform) GetStringTypeDeclarationSQL(column map[string]in
 
 	return a.GetVarcharTypeDeclarationSQLSnippet(length)
 }
-func (parent *AbstractPlatform) GetBinaryTypeDeclarationSQL(column map[string]interface{}) string {
+func (parent *AbstractPlatform) GetBinaryTypeDeclarationSQL(column map[string]any) string {
 	a := parent.child
 	length := a.ExtractLength(column)
 
@@ -79,14 +79,14 @@ func (parent *AbstractPlatform) GetBinaryTypeDeclarationSQL(column map[string]in
 
 	return a.GetVarbinaryTypeDeclarationSQLSnippet(length)
 }
-func (parent *AbstractPlatform) GetGuidTypeDeclarationSQL(column map[string]interface{}) string {
+func (parent *AbstractPlatform) GetGuidTypeDeclarationSQL(column map[string]any) string {
 	a := parent.child
 	column[`length`] = 36
 	column[`fixed`] = true
 
 	return a.GetStringTypeDeclarationSQL(column)
 }
-func (parent *AbstractPlatform) GetJsonTypeDeclarationSQL(column map[string]interface{}) string {
+func (parent *AbstractPlatform) GetJsonTypeDeclarationSQL(column map[string]any) string {
 	a := parent.child
 	return a.GetClobTypeDeclarationSQL(column)
 }
@@ -548,7 +548,7 @@ func (parent *AbstractPlatform) BuildCreateTableSQL(
 	options[`uniqueConstraints`] = uniqueConstraints
 	options[`foreignKeys`] = foreignKeys
 
-	columns := make([]map[string]interface{}, 0)
+	columns := make([]map[string]any, 0)
 	for _, column := range table.GetColumns() {
 		columnData := a.ColumnToArray(column)
 
@@ -670,8 +670,8 @@ func (parent *AbstractPlatform) GetInlineColumnCommentSQL(comment string) string
 }
 func (parent *AbstractPlatform) GetCreateTableInnerSQL(
 	name string,
-	columns []map[string]interface{},
-	options map[string]interface{},
+	columns []map[string]any,
+	options map[string]any,
 ) []string {
 	a := parent.child
 	columnListSql := a.GetColumnDeclarationListSQL(columns)
@@ -974,7 +974,7 @@ func (parent *AbstractPlatform) GetRenameColumnSQL(
 		),
 	}
 }
-func (parent *AbstractPlatform) GetColumnDeclarationListSQL(columns []map[string]interface{}) string {
+func (parent *AbstractPlatform) GetColumnDeclarationListSQL(columns []map[string]any) string {
 	a := parent.child
 	declarations := make([]string, 0)
 
@@ -988,10 +988,7 @@ func (parent *AbstractPlatform) GetColumnDeclarationListSQL(columns []map[string
 	return strings.Join(declarations, `, `)
 }
 
-func (parent *AbstractPlatform) GetColumnDeclarationSQL(
-	name string,
-	column map[string]interface{},
-) string {
+func (parent *AbstractPlatform) GetColumnDeclarationSQL(name string, column map[string]any) string {
 	a := parent.child
 	declaration := ""
 	if v, ok := column[`columnDefinition`]; ok && v != nil && v.(*string) != nil && *(v.(*string)) != "" {
@@ -1028,7 +1025,7 @@ func (parent *AbstractPlatform) GetColumnDeclarationSQL(
 
 	return name + ` ` + declaration
 }
-func (parent *AbstractPlatform) GetDecimalTypeDeclarationSQL(column map[string]interface{}) string {
+func (parent *AbstractPlatform) GetDecimalTypeDeclarationSQL(column map[string]any) string {
 	precision, hasPrecision := column[`precision`]
 	scale, hasScale := column[`scale`]
 
@@ -1050,7 +1047,7 @@ func (parent *AbstractPlatform) GetDecimalTypeDeclarationSQL(column map[string]i
 	return `NUMERIC(` + precisionStr + `, ` + scaleStr + `)`
 }
 
-func (parent *AbstractPlatform) GetDefaultValueDeclarationSQL(column map[string]interface{}) string {
+func (parent *AbstractPlatform) GetDefaultValueDeclarationSQL(column map[string]any) string {
 	a := parent.child
 	defaultColumn, ok := column[`default`]
 	if !ok || defaultColumn == "" {
@@ -1098,7 +1095,7 @@ func (parent *AbstractPlatform) GetDefaultValueDeclarationSQL(column map[string]
 
 	return ` DEFAULT ` + a.QuoteStringLiteral(defaultType)
 }
-func (parent *AbstractPlatform) GetCheckDeclarationSQL(definition []map[string]interface{}) string {
+func (parent *AbstractPlatform) GetCheckDeclarationSQL(definition []map[string]any) string {
 	constraints := make([]string, 0)
 	for _, def := range definition {
 		if v, ok := def[`min`]; ok {
@@ -1309,15 +1306,15 @@ func (parent *AbstractPlatform) GetDropDatabaseSQL(name string) string {
 	return `DROP ` + `DATABASE ` + name
 }
 
-func (parent *AbstractPlatform) GetDateTimeTzTypeDeclarationSQL(column map[string]interface{}) string {
+func (parent *AbstractPlatform) GetDateTimeTzTypeDeclarationSQL(column map[string]any) string {
 	a := parent.child
 	return a.GetDateTimeTypeDeclarationSQL(column)
 }
 
-func (parent *AbstractPlatform) GetFloatTypeDeclarationSQL(column map[string]interface{}) string {
+func (parent *AbstractPlatform) GetFloatTypeDeclarationSQL(column map[string]any) string {
 	return `DOUBLE PRECISION`
 }
-func (parent *AbstractPlatform) GetSmallFloatTypeDeclarationSQL(column map[string]interface{}) string {
+func (parent *AbstractPlatform) GetSmallFloatTypeDeclarationSQL(column map[string]any) string {
 	return `REAL`
 }
 func (parent *AbstractPlatform) SupportsSequences() bool {
@@ -1453,7 +1450,7 @@ func (parent *AbstractPlatform) EscapeStringForLike(
 
 	return sql
 }
-func (parent *AbstractPlatform) ColumnToArray(column *assets.Column) map[string]interface{} {
+func (parent *AbstractPlatform) ColumnToArray(column *assets.Column) map[string]any {
 	a := parent.child
 	arr := column.ToArray()
 	arr[`name`] = column.GetQuotedName(a)
@@ -1509,7 +1506,7 @@ func (parent *AbstractPlatform) GetUnionDistinctSQL() string {
 	return `UNION`
 }
 
-func (parent *AbstractPlatform) GetAsciiStringTypeDeclarationSQL(column map[string]interface{}) string {
+func (parent *AbstractPlatform) GetAsciiStringTypeDeclarationSQL(column map[string]any) string {
 	a := parent.child
 	return a.GetStringTypeDeclarationSQL(column)
 }

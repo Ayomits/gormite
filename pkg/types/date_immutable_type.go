@@ -7,10 +7,7 @@ import (
 
 type DateImmutableType struct{ *AbstractType }
 
-func (d *DateImmutableType) GetSQLDeclaration(
-	column map[string]interface{},
-	platform TypesPlatform,
-) string {
+func (d *DateImmutableType) GetSQLDeclaration(column map[string]any, platform TypesPlatform) string {
 	return platform.GetDateTypeDeclarationSQL(column)
 }
 func (d *DateImmutableType) ConvertToDatabaseValue(value any, platform TypesPlatform) *string {

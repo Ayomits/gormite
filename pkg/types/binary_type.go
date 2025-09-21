@@ -8,10 +8,7 @@ import (
 
 type BinaryType struct{ *AbstractType }
 
-func (b *BinaryType) GetSQLDeclaration(
-	column map[string]interface{},
-	platform TypesPlatform,
-) string {
+func (b *BinaryType) GetSQLDeclaration(column map[string]any, platform TypesPlatform) string {
 	return platform.GetBinaryTypeDeclarationSQL(column)
 }
 func (b *BinaryType) ConvertToPHPValue(value any, platform TypesPlatform) any {

@@ -222,7 +222,7 @@ func (s *Schema) CreateTable(name string) *Table {
 		make([]*Index, 0),
 		make([]*UniqueConstraint, 0),
 		make([]*ForeignKeyConstraint, 0),
-		make(map[string]interface{}),
+		make(map[string]any),
 	)
 
 	s.addTable(table)

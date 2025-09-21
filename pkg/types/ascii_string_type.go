@@ -6,10 +6,7 @@ import (
 
 type AsciiStringType struct{ *StringType }
 
-func (a *AsciiStringType) GetSQLDeclaration(
-	column map[string]interface{},
-	platform TypesPlatform,
-) string {
+func (a *AsciiStringType) GetSQLDeclaration(column map[string]any, platform TypesPlatform) string {
 	return platform.GetAsciiStringTypeDeclarationSQL(column)
 }
 

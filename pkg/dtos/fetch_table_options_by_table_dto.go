@@ -6,8 +6,8 @@ type FetchTableOptionsByTableDto struct {
 	Comment  *string `db:"comment"`
 }
 
-func (f *FetchTableOptionsByTableDto) ToArray() map[string]interface{} {
-	return map[string]interface{}{
+func (f *FetchTableOptionsByTableDto) ToArray() map[string]any {
+	return map[string]any{
 		"relname":  f.Relname,
 		"unlogged": f.Unlogged,
 		"comment":  f.Comment,

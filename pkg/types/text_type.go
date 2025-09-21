@@ -6,10 +6,7 @@ func NewTextType() *TextType {
 	return &TextType{AbstractType: &AbstractType{}}
 }
 
-func (t *TextType) GetSQLDeclaration(
-	column map[string]interface{},
-	platform TypesPlatform,
-) string {
+func (t *TextType) GetSQLDeclaration(column map[string]any, platform TypesPlatform) string {
 	return platform.GetClobTypeDeclarationSQL(column)
 }
 func (t *TextType) ConvertToPHPValue(value any, platform TypesPlatform) any {

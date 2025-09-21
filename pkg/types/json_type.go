@@ -10,10 +10,7 @@ func NewJsonType() *JsonType {
 	return &JsonType{AbstractType: &AbstractType{}}
 }
 
-func (j *JsonType) GetSQLDeclaration(
-	column map[string]interface{},
-	platform TypesPlatform,
-) string {
+func (j *JsonType) GetSQLDeclaration(column map[string]any, platform TypesPlatform) string {
 	return platform.GetJsonTypeDeclarationSQL(column)
 }
 func (j *JsonType) ConvertToDatabaseValue(value any, platform TypesPlatform) *string {
@@ -40,7 +37,7 @@ func (j *JsonType) ConvertToPHPValue(value any, platform TypesPlatform) any {
 		return v
 	}
 
-	var data []map[string]interface{}
+	var data []map[string]any
 
 	if err := json.Unmarshal([]byte(value.(string)), &data); err != nil {
 		panic(err)

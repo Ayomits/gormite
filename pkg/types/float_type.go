@@ -10,10 +10,7 @@ func NewFloatType() *FloatType {
 	return &FloatType{AbstractType: &AbstractType{}}
 }
 
-func (f *FloatType) GetSQLDeclaration(
-	column map[string]interface{},
-	platform TypesPlatform,
-) string {
+func (f *FloatType) GetSQLDeclaration(column map[string]any, platform TypesPlatform) string {
 	return platform.GetFloatTypeDeclarationSQL(column)
 }
 func (f *FloatType) ConvertToPHPValue(value any, _ TypesPlatform) any {

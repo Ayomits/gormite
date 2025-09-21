@@ -6,10 +6,7 @@ import (
 
 type TimeType struct{ *AbstractType }
 
-func (t *TimeType) GetSQLDeclaration(
-	column map[string]interface{},
-	platform TypesPlatform,
-) string {
+func (t *TimeType) GetSQLDeclaration(column map[string]any, platform TypesPlatform) string {
 	return platform.GetTimeTypeDeclarationSQL(column)
 }
 func (t *TimeType) ConvertToDatabaseValue(value any, platform TypesPlatform) any {

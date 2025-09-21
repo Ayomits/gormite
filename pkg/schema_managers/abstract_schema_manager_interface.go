@@ -12,10 +12,10 @@ type AbstractSchemaManagerInterface interface {
 	CreateSchemaConfig() *dtos.SchemaConfig
 	ListSchemaNames() []string
 
-	GetPortableDatabaseDefinition(row map[string]interface{}) string
+	GetPortableDatabaseDefinition(row map[string]any) string
 	GetPortableSequenceDefinition(sequence *dtos.ListSequencesDto) *assets.Sequence
 	GetPortableTableColumnDefinition(tableColumn *dtos.SelectTableColumnsDto) *assets.Column
-	GetPortableViewDefinition(view map[string]interface{}) *assets.View
+	GetPortableViewDefinition(view map[string]any) *assets.View
 	GetPortableTableForeignKeyDefinition(tableForeignKey *dtos.SelectForeignKeyColumnsDto) *assets.ForeignKeyConstraint
 
 	GetPortableTableDefinition(table dtos.GetPortableTableDefinitionInputDto) string

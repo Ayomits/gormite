@@ -2,10 +2,7 @@ package types
 
 type DateTimeTzImmutableType struct{ *AbstractType }
 
-func (d *DateTimeTzImmutableType) GetSQLDeclaration(
-	column map[string]interface{},
-	platform TypesPlatform,
-) string {
+func (d *DateTimeTzImmutableType) GetSQLDeclaration(column map[string]any, platform TypesPlatform) string {
 	return platform.GetDateTimeTzTypeDeclarationSQL(column)
 }
 func (d *DateTimeTzImmutableType) ConvertToDatabaseValue(

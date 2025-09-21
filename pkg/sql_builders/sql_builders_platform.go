@@ -29,44 +29,26 @@ type SqlBuildersPlatform interface {
 	GetDropForeignKeySQL(foreignKey string, table string) string
 	GetDropUniqueConstraintSQL(name string, tableName string) string
 	GetCreateTableSQL(table *assets.Table) []string
-	GetCreateTableInnerSQL(
-		name string,
-		columns []map[string]interface{},
-		options map[string]interface{},
-	) []string
+	GetCreateTableInnerSQL(name string, columns []map[string]any, options map[string]any) []string
 	GetCreateTableWithoutForeignKeysSQL(table *assets.Table) []string
 	BuildCreateTableSQL(table *assets.Table, createForeignKeys bool) []string
 	GetCommentOnTableSQL(tableName string, comment string) string
-	GetCommentOnColumnSQL(
-		tableName string,
-		columnName string,
-		comment string,
-	) string
+	GetCommentOnColumnSQL(tableName string, columnName string, comment string) string
 	GetInlineColumnCommentSQL(comment string) string
 	GetCreateTemporaryTableSnippetSQL() string
 	GetAlterSequenceSQL(sequence *assets.Sequence) string
 	GetCreateIndexSQL(index *assets.Index, table string) string
 	GetPartialIndexSQL(index *assets.Index) string
 	GetCreatePrimaryKeySQL(index *assets.Index, table string) string
-	GetCreateUniqueConstraintSQL(
-		constraint *assets.UniqueConstraint,
-		tableName string,
-	) string
+	GetCreateUniqueConstraintSQL(constraint *assets.UniqueConstraint, tableName string) string
 	GetDropSchemaSQL(schemaName string) string
-	GetCreateForeignKeySQL(
-		foreignKey *assets.ForeignKeyConstraint,
-		table string,
-	) string
+	GetCreateForeignKeySQL(foreignKey *assets.ForeignKeyConstraint, table string) string
 	GetRenameTableSQL(oldName string, newName string) string
-	GetRenameIndexSQL(
-		oldIndexName string,
-		index *assets.Index,
-		tableName string,
-	) []string
-	GetColumnDeclarationListSQL(columns []map[string]interface{}) string
-	GetColumnDeclarationSQL(name string, column map[string]interface{}) string
-	GetDefaultValueDeclarationSQL(column map[string]interface{}) string
-	GetCheckDeclarationSQL(definition []map[string]interface{}) string
+	GetRenameIndexSQL(oldIndexName string, index *assets.Index, tableName string) []string
+	GetColumnDeclarationListSQL(columns []map[string]any) string
+	GetColumnDeclarationSQL(name string, column map[string]any) string
+	GetDefaultValueDeclarationSQL(column map[string]any) string
+	GetCheckDeclarationSQL(definition []map[string]any) string
 	GetUniqueConstraintDeclarationSQL(constraint *assets.UniqueConstraint) string
 	GetIndexDeclarationSQL(index *assets.Index) string
 	GetForeignKeyDeclarationSQL(foreignKey *assets.ForeignKeyConstraint) string

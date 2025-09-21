@@ -130,7 +130,7 @@ func (m *PostgreSQLSchemaManager) GetPortableTableForeignKeyDefinition(tableFore
 			localColumns,
 			foreignTable,
 			foreignColumns,
-			map[string]interface{}{
+			map[string]any{
 				"onUpdate": onUpdate,
 				"onDelete": onDelete,
 			},
@@ -140,7 +140,7 @@ func (m *PostgreSQLSchemaManager) GetPortableTableForeignKeyDefinition(tableFore
 	panic(fmt.Errorf("invalid foreign key definition"))
 }
 
-func (m *PostgreSQLSchemaManager) GetPortableDatabaseDefinition(row map[string]interface{}) string {
+func (m *PostgreSQLSchemaManager) GetPortableDatabaseDefinition(row map[string]any) string {
 	return row["datname"].(string)
 }
 
@@ -298,7 +298,7 @@ func (m *PostgreSQLSchemaManager) GetPortableTableColumnDefinition(tableColumn *
 	return column
 }
 
-func (m *PostgreSQLSchemaManager) GetPortableViewDefinition(view map[string]interface{}) *assets.View {
+func (m *PostgreSQLSchemaManager) GetPortableViewDefinition(view map[string]any) *assets.View {
 	return assets.NewView(
 		view["schemaname"].(string)+"."+view["viewname"].(string),
 		view["definition"].(string),

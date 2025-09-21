@@ -29,7 +29,7 @@ type Table struct {
 
 	fkConstraints map[string]*ForeignKeyConstraint
 
-	options map[string]interface{}
+	options map[string]any
 
 	schemaConfig *dtos.SchemaConfig
 }
@@ -40,7 +40,7 @@ func NewTable(
 	indexes []*Index,
 	uniqueConstraints []*UniqueConstraint,
 	fkConstraints []*ForeignKeyConstraint,
-	options map[string]interface{},
+	options map[string]any,
 ) *Table {
 	if name == "" {
 		panic("name must not be empty")
@@ -55,7 +55,7 @@ func NewTable(
 		primaryKeyName:    nil,
 		uniqueConstraints: make(map[string]*UniqueConstraint),
 		fkConstraints:     make(map[string]*ForeignKeyConstraint),
-		options: map[string]interface{}{
+		options: map[string]any{
 			"createoptions": make(map[string]string),
 		},
 		schemaConfig: nil,
@@ -103,7 +103,7 @@ func (t *Table) SetPrimaryKey(columnNames []string, indexName *string) *Table {
 			true,
 			true,
 			make([]string, 0),
-			make(map[string]interface{}),
+			make(map[string]any),
 		),
 	)
 
@@ -143,12 +143,7 @@ func (t *Table) AddUniqueConstraint(
 	)
 }
 
-func (t *Table) AddIndex(
-	columnNames []string,
-	indexName *string,
-	flags []string,
-	options map[string]interface{},
-) *Table {
+func (t *Table) AddIndex(columnNames []string, indexName *string, flags []string, options map[string]any) *Table {
 	if indexName == nil || len(*indexName) > t.getMaxIdentifierLength() {
 		columns := make([]string, 0)
 		columns = append(columns, t.GetName())
@@ -195,11 +190,7 @@ func (t *Table) DropIndex(name string) {
 	delete(t.indexes, name)
 }
 
-func (t *Table) AddUniqueIndex(
-	columnNames []string,
-	indexName *string,
-	options map[string]interface{},
-) *Table {
+func (t *Table) AddUniqueIndex(columnNames []string, indexName *string, options map[string]any) *Table {
 	if indexName == nil || len(*indexName) > t.getMaxIdentifierLength() {
 		columns := make([]string, 0)
 		columns = append(columns, t.GetName())
@@ -327,10 +318,7 @@ func (t *Table) RenameColumn(oldName string, newName string) *Column {
 	return column
 }
 
-func (t *Table) ModifyColumn(
-	name string,
-	options map[string]interface{},
-) *Table {
+func (t *Table) ModifyColumn(name string, options map[string]any) *Table {
 	column := t.GetColumn(name)
 
 	if len(options) > 0 {
@@ -357,7 +345,7 @@ func (t *Table) AddForeignKeyConstraint(
 	foreignTableName string,
 	localColumnNames []string,
 	foreignColumnNames []string,
-	options map[string]interface{},
+	options map[string]any,
 	name *string,
 ) *Table {
 	if name == nil {
@@ -389,7 +377,7 @@ func (t *Table) AddForeignKeyConstraint(
 	return t.addForeignKeyConstraint(constraint)
 }
 
-func (t *Table) AddOption(name string, value interface{}) *Table {
+func (t *Table) AddOption(name string, value any) *Table {
 	t.options[name] = value
 
 	return t
@@ -549,7 +537,7 @@ func (t *Table) HasOption(name string) bool {
 	return ok
 }
 
-func (t *Table) GetOption(name string) interface{} {
+func (t *Table) GetOption(name string) any {
 	v, ok := t.options[name]
 	if !ok {
 		panic("not found")
@@ -558,9 +546,9 @@ func (t *Table) GetOption(name string) interface{} {
 	return v
 }
 
-func (t *Table) GetOptions() map[string]interface{} {
+func (t *Table) GetOptions() map[string]any {
 	if t.options == nil { // TODO: ПОПРАВИТЬ
-		return make(map[string]interface{})
+		return make(map[string]any)
 	}
 
 	return t.options
@@ -657,7 +645,7 @@ func (t *Table) addUniqueConstraint(constraint *UniqueConstraint) *Table {
 		true,
 		false,
 		make([]string, 0),
-		make(map[string]interface{}),
+		make(map[string]any),
 	)
 
 	for _, existingIndex := range t.indexes {
@@ -705,7 +693,7 @@ func (t *Table) addForeignKeyConstraint(constraint *ForeignKeyConstraint) *Table
 		false,
 		false,
 		make([]string, 0),
-		make(map[string]interface{}),
+		make(map[string]any),
 	)
 
 	for _, existingIndex := range t.indexes {
@@ -791,7 +779,7 @@ func (t *Table) createIndex(
 	isUnique bool,
 	isPrimary bool,
 	flags []string,
-	options map[string]interface{},
+	options map[string]any,
 ) *Index {
 	if matched, err := regexp.Match(
 		"([^a-zA-Z0-9_]+)",

@@ -35,10 +35,7 @@ var BuiltinTypesMap = map[enums.TypesType]AbstractTypeInterface{
 }
 
 type AbstractTypeInterface interface {
-	GetSQLDeclaration(
-		column map[string]interface{},
-		platform TypesPlatform,
-	) string
+	GetSQLDeclaration(column map[string]any, platform TypesPlatform) string
 	ConvertToPHPValue(value any, platform TypesPlatform) any
 	GetMappedDatabaseTypes(platform TypesPlatform) []string
 }
@@ -50,16 +47,10 @@ type AbstractType struct{}
 func (a *AbstractType) NewAbstractType() *AbstractType {
 	return &AbstractType{}
 }
-func (a *AbstractType) ConvertToDatabaseValue(
-	value any,
-	platform TypesPlatform,
-) any {
+func (a *AbstractType) ConvertToDatabaseValue(value any, platform TypesPlatform) any {
 	return value
 }
-func (a *AbstractType) ConvertToPHPValue(
-	value any,
-	platform TypesPlatform,
-) any {
+func (a *AbstractType) ConvertToPHPValue(value any, platform TypesPlatform) any {
 	return value
 }
 func GetTypeRegistry() *TypeRegistry {
@@ -110,16 +101,10 @@ func GetTypesMap() map[enums.TypesType]string {
 		},
 	)
 }
-func (a *AbstractType) ConvertToDatabaseValueSQL(
-	sqlExpr string,
-	platform TypesPlatform,
-) string {
+func (a *AbstractType) ConvertToDatabaseValueSQL(sqlExpr string, platform TypesPlatform) string {
 	return sqlExpr
 }
-func (a *AbstractType) ConvertToPHPValueSQL(
-	sqlExpr string,
-	platform TypesPlatform,
-) string {
+func (a *AbstractType) ConvertToPHPValueSQL(sqlExpr string, platform TypesPlatform) string {
 	return sqlExpr
 }
 func (a *AbstractType) GetMappedDatabaseTypes(platform TypesPlatform) []string {

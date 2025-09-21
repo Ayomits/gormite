@@ -11,10 +11,7 @@ func NewIntegerType() *IntegerType {
 	return &IntegerType{AbstractType: &AbstractType{}}
 }
 
-func (i *IntegerType) GetSQLDeclaration(
-	column map[string]interface{},
-	platform TypesPlatform,
-) string {
+func (i *IntegerType) GetSQLDeclaration(column map[string]any, platform TypesPlatform) string {
 	return platform.GetIntegerTypeDeclarationSQL(column)
 }
 func (i *IntegerType) ConvertToPHPValue(value any, platform TypesPlatform) any {

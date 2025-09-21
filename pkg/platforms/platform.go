@@ -41,7 +41,7 @@ type AbstractPlatformInterface interface {
 	QuoteStringLiteral(str string) string
 
 	InitializeAllDoctrineTypeMappings()
-	ExtractLength(data map[string]interface{}) *int
+	ExtractLength(data map[string]any) *int
 	RegisterDoctrineTypeMapping(dbType string, doctrineType string)
 	GetRegexpExpression() string
 	GetLengthExpression(string string) string
@@ -80,7 +80,7 @@ type AbstractPlatformInterface interface {
 	ReleaseSavePoint(savepoint string) string
 	RollbackSavePoint(savepoint string) string
 	EscapeStringForLike(inputString string, escapeChar string) string
-	ColumnToArray(column *assets.Column) map[string]interface{}
+	ColumnToArray(column *assets.Column) map[string]any
 	GetLikeWildcardCharacters() string
 	GetPreAlterTableIndexForeignKeySQL(diff *diff_dtos.TableDiff) []string
 	GetPostAlterTableIndexForeignKeySQL(diff *diff_dtos.TableDiff) []string

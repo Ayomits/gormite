@@ -6,10 +6,7 @@ import (
 
 type BlobType struct{ *AbstractType }
 
-func (b *BlobType) GetSQLDeclaration(
-	column map[string]interface{},
-	platform TypesPlatform,
-) string {
+func (b *BlobType) GetSQLDeclaration(column map[string]any, platform TypesPlatform) string {
 	return platform.GetBlobTypeDeclarationSQL(column)
 }
 

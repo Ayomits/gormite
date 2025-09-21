@@ -12,10 +12,7 @@ func NewBigintType() *BigintType {
 	return &BigintType{AbstractType: &AbstractType{}}
 }
 
-func (b *BigintType) GetSQLDeclaration(
-	column map[string]interface{},
-	platform TypesPlatform,
-) string {
+func (b *BigintType) GetSQLDeclaration(column map[string]any, platform TypesPlatform) string {
 	return platform.GetBigIntTypeDeclarationSQL(column)
 }
 

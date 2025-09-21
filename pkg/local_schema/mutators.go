@@ -87,7 +87,7 @@ func applyMetadataMutatorsForNewColumn(
 
 func applyMetadataMutatorsAfterColumnsIntrospection(bag *tableBag) {
 	for indexName, columns := range bag.indexColumnsMap {
-		options := make(map[string]interface{})
+		options := make(map[string]any)
 
 		if v, ok := bag.indexConditionsMap[indexName]; ok {
 			options["where"] = v
@@ -103,7 +103,7 @@ func applyMetadataMutatorsAfterColumnsIntrospection(bag *tableBag) {
 			strings.Join(columns, "_"),
 		)
 
-		options := make(map[string]interface{})
+		options := make(map[string]any)
 
 		if v, ok := bag.uniqConditionsMap[uniqPseudoName]; ok {
 			options["where"] = v

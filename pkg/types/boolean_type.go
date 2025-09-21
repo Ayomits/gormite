@@ -10,16 +10,10 @@ func NewBooleanType() *BooleanType {
 	return &BooleanType{AbstractType: &AbstractType{}}
 }
 
-func (b *BooleanType) GetSQLDeclaration(
-	column map[string]interface{},
-	platform TypesPlatform,
-) string {
+func (b *BooleanType) GetSQLDeclaration(column map[string]any, platform TypesPlatform) string {
 	return platform.GetBooleanTypeDeclarationSQL(column)
 }
-func (b *BooleanType) ConvertToDatabaseValue(
-	value any,
-	platform TypesPlatform,
-) any {
+func (b *BooleanType) ConvertToDatabaseValue(value any, platform TypesPlatform) any {
 	return platform.ConvertBooleansToDatabaseValue(value)
 }
 func (b *BooleanType) ConvertToPHPValue(value any, platform TypesPlatform) any {

@@ -6,10 +6,7 @@ func NewDateTimeImmutableType() *DateTimeImmutableType {
 	return &DateTimeImmutableType{AbstractType: &AbstractType{}}
 }
 
-func (d *DateTimeImmutableType) GetSQLDeclaration(
-	column map[string]interface{},
-	platform TypesPlatform,
-) string {
+func (d *DateTimeImmutableType) GetSQLDeclaration(column map[string]any, platform TypesPlatform) string {
 	return platform.GetDateTimeTypeDeclarationSQL(column)
 }
 func (d *DateTimeImmutableType) ConvertToDatabaseValue(

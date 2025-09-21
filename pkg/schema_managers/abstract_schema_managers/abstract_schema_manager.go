@@ -33,7 +33,7 @@ func NewAbstractSchemaManager(
 func (m *AbstractSchemaManager) ListDatabases() []string {
 	return smt.MapSlice(
 		m.Connection.FetchAllAssociative(m.Platform.GetListDatabasesSQL()),
-		func(t map[string]interface{}) string {
+		func(t map[string]any) string {
 			return m.Child.GetPortableDatabaseDefinition(t)
 		},
 	)
@@ -189,7 +189,7 @@ func (m *AbstractSchemaManager) IntrospectTable(name string) *assets.Table {
 func (m *AbstractSchemaManager) ListViews() []*assets.View {
 	return smt.MapSlice(
 		m.Connection.FetchAllAssociative(m.Platform.GetListViewsSQL(m.getDatabase())),
-		func(t map[string]interface{}) *assets.View {
+		func(t map[string]any) *assets.View {
 			return m.Child.GetPortableViewDefinition(t)
 		},
 	)
@@ -219,8 +219,8 @@ type getPortableTableIndexesListOptionsSubDto struct {
 	where   string
 }
 
-func (g *getPortableTableIndexesListOptionsSubDto) asMap() map[string]interface{} {
-	res := map[string]interface{}{}
+func (g *getPortableTableIndexesListOptionsSubDto) asMap() map[string]any {
+	res := map[string]any{}
 
 	if len(g.lengths) > 0 {
 		res["lengths"] = g.lengths

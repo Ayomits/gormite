@@ -58,4 +58,3 @@ Once you have prepared the entities and YAML file, Gormite analyzes the structur
 - [ ] Avoid panics logic
 - [ ] Refactor the code
 - [ ] Add more tests
-- [ ] `interface{}` to `any`

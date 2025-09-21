@@ -10,7 +10,7 @@ import (
 	"github.com/KoNekoD/gormite/pkg/platforms"
 	"github.com/KoNekoD/gormite/pkg/platforms/postgres_platform"
 	"github.com/KoNekoD/gormite/pkg/schema_managers/postgres_schema_manager"
-	_ "github.com/KoNekoD/gormite/test/docs_example/resources"
+	_ "github.com/KoNekoD/gormite/tests/docs_example/resources"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/pkg/errors"
 	"testing"

@@ -1,6 +1,6 @@
 package entities
 
-import "github.com/KoNekoD/gormite/test/docs_example/pkg/enums"
+import "github.com/KoNekoD/gormite/tests/docs_example/pkg/enums"
 
 // Entities can have custom table names
 //      \/
